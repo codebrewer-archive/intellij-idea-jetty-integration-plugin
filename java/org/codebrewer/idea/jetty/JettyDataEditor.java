@@ -37,7 +37,7 @@ import javax.swing.event.DocumentEvent;
 
 /**
  * @author Mark Scott
- * @version $Id$
+ * @version $Id:$
  */
 public class JettyDataEditor extends ApplicationServerPersistentDataEditor<JettyPersistentData>
 {

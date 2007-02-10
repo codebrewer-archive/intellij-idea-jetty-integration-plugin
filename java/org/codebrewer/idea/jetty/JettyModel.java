@@ -45,7 +45,7 @@ import java.util.Set;
 
 /**
  * @author Mark Scott
- * @version $Id$
+ * @version $Id:$
  */
 public class JettyModel implements ServerModel
 {

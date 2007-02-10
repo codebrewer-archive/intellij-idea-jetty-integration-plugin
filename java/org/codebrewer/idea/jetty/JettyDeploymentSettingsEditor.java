@@ -30,7 +30,7 @@ import javax.swing.JLabel;
  * Editor to configure Jetty for run and debug sessions.  Not currently used.
  *
  * @author Mark Scott
- * @version $Id$
+ * @version $Id:$
  */
 public class JettyDeploymentSettingsEditor extends SettingsEditor<DeploymentModel>
 {

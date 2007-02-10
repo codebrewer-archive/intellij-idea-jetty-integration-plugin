@@ -2,6 +2,7 @@
 <idea-plugin version="2">
   <name>Jetty Integration</name>
   <id>Jetty Integration</id>
+  <description>Allows configuration and use of the Jetty webserver directly from IntelliJ IDEA, for deploying and running/debugging web applications.</description>
   <version>##PLUGIN_VERSION##</version>
   <vendor email="mark@codebrewer.org" logo="/images/jetty16x16.png">Codebrewer</vendor>
   <change-notes>

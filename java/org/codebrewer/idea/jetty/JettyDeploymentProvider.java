@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NonNls;
 
 /**
  * @author Mark Scott
- * @version $Id$
+ * @version $Id:$
  */
 public class JettyDeploymentProvider implements DeploymentProvider
 {

@@ -19,7 +19,7 @@
 ::
 :: (Naïve) DOS batch file for controlling Jetty
 ::
-:: $Id$
+:: $Id:$
 ::
 
 setlocal

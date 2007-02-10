@@ -36,7 +36,7 @@ import java.util.List;
 
 /**
  * @author Mark Scott
- * @version $Id$
+ * @version $Id:$
  */
 public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
 {

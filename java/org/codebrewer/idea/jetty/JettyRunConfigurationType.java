@@ -27,7 +27,7 @@ import javax.swing.Icon;
 
 /**
  * @author Mark Scott
- * @version $Id$
+ * @version $Id:$
  */
 public class JettyRunConfigurationType extends J2EEConfigurationType
 {

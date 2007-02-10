@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 
 /**
  * @author Mark Scott
- * @version $Id$
+ * @version $Id:$
  */
 public abstract class AbstractJettyVersionFileChecker implements JettyVersionChecker
 {

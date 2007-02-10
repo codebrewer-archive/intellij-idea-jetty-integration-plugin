@@ -23,7 +23,7 @@ import org.jdom.Element;
 
 /**
  * @author Mark Scott
- * @version $Id$
+ * @version $Id:$
  */
 public class JettyPersistentData implements ApplicationServerPersistentData
 {

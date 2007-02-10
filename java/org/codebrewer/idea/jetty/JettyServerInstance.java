@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NonNls;
 
 /**
  * @author Mark Scott
- * @version $Id$
+ * @version $Id:$
  */
 public class JettyServerInstance extends DefaultServerInstance
 {
