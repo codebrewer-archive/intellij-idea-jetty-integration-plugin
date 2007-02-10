@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Mark Scott
- * @version $Id:$
+ * @version $Id$
  */
 public interface JettyVersionChecker
 {

@@ -21,7 +21,7 @@ import com.intellij.javaee.run.configuration.CommonModel;
 
 /**
  * @author Mark Scott
- * @version $Id:$
+ * @version $Id$
  */
 public class JettyModuleDeploymentModel extends DeploymentModel
 {

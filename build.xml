@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<!-- $Id:$ -->
+<!-- $Id$ -->
 
 <project name="Jetty Integration Plug-in" default="build" basedir=".">
 

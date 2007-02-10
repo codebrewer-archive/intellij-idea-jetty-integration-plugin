@@ -23,7 +23,7 @@ import java.io.File;
 
 /**
  * @author Mark Scott
- * @version $Id:$
+ * @version $Id$
  */
 public class JettyUtil
 {

@@ -27,7 +27,7 @@ import java.util.ArrayList;
 
 /**
  * @author Mark Scott
- * @version $Id:$
+ * @version $Id$
  */
 public class JettyApplicationServerHelper implements ApplicationServerHelper
 {

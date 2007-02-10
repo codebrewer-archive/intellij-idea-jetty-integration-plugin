@@ -25,7 +25,7 @@ import javax.swing.JLabel;
 
 /**
  * @author Mark Scott
- * @version $Id:$
+ * @version $Id$
  */
 public class JettyLocalRunConfigurationEditor extends SettingsEditor<CommonModel>
 {

@@ -25,7 +25,7 @@ import java.util.ResourceBundle;
 
 /**
  * @author Mark Scott
- * @version $Id:$
+ * @version $Id$
  */
 public class JettyBundle
 {
