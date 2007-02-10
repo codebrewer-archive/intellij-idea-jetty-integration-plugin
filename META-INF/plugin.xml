@@ -1,0 +1,20 @@
+<!DOCTYPE idea-plugin PUBLIC "Plugin/DTD" "http://plugins.intellij.net/plugin.dtd">
+<idea-plugin version="2">
+  <name>Jetty Integration</name>
+  <id>Jetty</id>
+  <version>##PLUGIN_VERSION##</version>
+  <vendor email="mark@codebrewer.org" logo="/images/jetty16x16.png">Codebrewer</vendor>
+  <idea-version since-build="##IDEA_VERSION_MIN##" until-build="##IDEA_VERSION_MAX##" />
+  <resource-bundle>org.codebrewer.idea.jetty.JettyBundle</resource-bundle>
+  <!--<extensions defaultExtensionNs="com.intellij" xmlns="com.intellij">-->
+    <!--<errorHandler implementation="com.intellij.diagnostic.ITNReporter"/>-->
+  <!--</extensions>-->
+  <application-components>
+    <component>
+      <implementation-class>org.codebrewer.idea.jetty.JettyManager</implementation-class>
+    </component>
+    <component>
+      <implementation-class>org.codebrewer.idea.jetty.JettyRunConfigurationType</implementation-class>
+    </component>
+  </application-components>
+</idea-plugin>
