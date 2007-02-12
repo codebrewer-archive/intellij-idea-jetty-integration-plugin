@@ -38,10 +38,10 @@ if "%JETTY_OPTS%" == "" set JETTY_OPTS=-jar start.jar
 if not "%JAVA_OPTS%" == "" set JETTY_OPTS=%JAVA_OPTS% %JETTY_OPTS%
 
 set PWD=%CD%
-cd "%JETTY_HOME%"
+cd /d "%JETTY_HOME%"
 
 %JAVA_HOME%\bin\java.exe %JETTY_OPTS%
 
-cd "%PWD%"
+cd /d "%PWD%"
 
 exit 0
