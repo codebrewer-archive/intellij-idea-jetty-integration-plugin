@@ -100,5 +100,6 @@ public class JettyManager extends AppServerIntegration
 
   public void initComponent()
   {
+    JettyStartupPolicy.ensureExecutable();
   }
 }

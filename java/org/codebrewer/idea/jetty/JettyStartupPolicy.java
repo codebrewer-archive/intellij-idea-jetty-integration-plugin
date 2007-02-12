@@ -24,6 +24,7 @@ import com.intellij.javaee.run.localRun.ExecutableObject;
 import com.intellij.javaee.run.localRun.ExecutableObjectStartupPolicy;
 import com.intellij.javaee.run.localRun.ScriptsHelper;
 import com.intellij.openapi.application.PathManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.projectRoots.ProjectJdk;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.SystemInfo;
@@ -31,6 +32,7 @@ import com.intellij.util.EnvironmentUtil;
 import org.jetbrains.annotations.NonNls;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -146,5 +148,26 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
     };
 
     return helper;
+  }
+
+  public static void ensureExecutable()
+  {
+    if (!SystemInfo.isWindows) {
+      final Logger logger = Logger.getInstance(JettyManager.class.getName());
+      final File jettyLauncherFile = getJettyLauncherFile();
+      final ProcessBuilder processBuilder = new ProcessBuilder("/bin/chmod", "+x", jettyLauncherFile.getAbsolutePath());
+
+      try {
+        final Process process = processBuilder.start();
+        final int exitValue = process.exitValue();
+
+        if (exitValue != 0) {
+          logger.warn("Couldn't set executable bit on " + jettyLauncherFile.getAbsolutePath());
+        }
+      }
+      catch (IOException e) {
+        logger.error("Couldn't set executable bit on " + jettyLauncherFile.getAbsolutePath(), e);
+      }
+    }
   }
 }
