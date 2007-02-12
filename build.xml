@@ -32,7 +32,7 @@
   <property name="staging" location="${jetty.staging}" />
   <property name="build" location="${staging}/build" />
   <property name="classes" location="${build}/classes" />
-  <property name="dist" location="${staging}/dist/${project.name.compressed}" />
+  <property name="dist" location="${staging}/dist" />
   <property name="help" location="docs/javahelp" />
 
   <path id="classpath" description="Classpath for compiling plug-in sources">
@@ -43,18 +43,6 @@
       <include name="openapi.jar" />
     </fileset>
   </path>
-
-  <macrodef name="zipdir">
-    <attribute name="destfile" />
-    <attribute name="sourcedir" />
-    <sequential>
-      <exec executable="/usr/bin/zip" dir="@{sourcedir}">
-        <arg value="-qr" />
-        <arg value="@{destfile}" />
-        <arg value="." />
-      </exec>
-    </sequential>
-  </macrodef>
 
   <target name="build"
           depends="clean, compile, copy_licences, copy_bin_dir, increment_build_number, make_jar, make_resources_jar, make_source_zip, make_plugin_zip"
@@ -86,10 +74,9 @@
 
   <target name="copy_bin_dir">
     <mkdir dir="${dist}/bin" />
-    <copy file="bin/jetty.bat" todir="${dist}/bin" />
-    <exec executable="/bin/cp" dir=".">
-      <arg line="-a bin/jetty.sh ${dist}/bin/" />
-    </exec>
+    <copy todir="${dist}/bin">
+      <fileset dir="${bin}" includes="*" />
+    </copy>
   </target>
 
   <target name="increment_build_number">
@@ -181,7 +168,9 @@
   </target>
 
   <target name="make_plugin_zip">
-    <zipdir sourcedir="${staging}/dist" destfile="${dist}" />
+    <zip destfile="${staging}/${project.name.compressed}.zip" encoding="UTF8">
+      <zipfileset dir="${dist}" prefix="${project.name.compressed}" />
+    </zip>
   </target>
 
   <target name="deploy" description="[Optional] - deploys the plug-in build to an IDEA plug-in development sandbox">

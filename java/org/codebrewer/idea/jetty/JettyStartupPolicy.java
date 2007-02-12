@@ -156,17 +156,21 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
       final Logger logger = Logger.getInstance(JettyManager.class.getName());
       final File jettyLauncherFile = getJettyLauncherFile();
       final ProcessBuilder processBuilder = new ProcessBuilder("/bin/chmod", "+x", jettyLauncherFile.getAbsolutePath());
+      final String errorMessage = "Couldn't set executable bit on " + jettyLauncherFile.getAbsolutePath();
 
       try {
         final Process process = processBuilder.start();
-        final int exitValue = process.exitValue();
+        final int exitValue = process.waitFor();
 
         if (exitValue != 0) {
-          logger.warn("Couldn't set executable bit on " + jettyLauncherFile.getAbsolutePath());
+          logger.warn(errorMessage);
         }
       }
       catch (IOException e) {
-        logger.error("Couldn't set executable bit on " + jettyLauncherFile.getAbsolutePath(), e);
+        logger.error(errorMessage, e);
+      }
+      catch (InterruptedException e) {
+        logger.error(errorMessage, e);
       }
     }
   }
