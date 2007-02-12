@@ -78,32 +78,17 @@
         <option name="myName" value="Project Default" />
         <option name="myLocal" value="false" />
         <used_levels>
-          <info color="ffff">
-            <option name="myName" value="STYLE" />
-            <option name="myVal" value="100" />
-            <option name="myExternalName" value="STYLE" />
-            <option name="myDefaultAttributes">
-              <value>
-                <option name="FOREGROUND" />
-                <option name="BACKGROUND" value="ffff00" />
-                <option name="FONT_TYPE" value="0" />
-                <option name="EFFECT_COLOR" />
-                <option name="EFFECT_TYPE" value="0" />
-                <option name="ERROR_STRIPE_COLOR" value="ffff00" />
-              </value>
-            </option>
-          </info>
           <error>
             <option name="myName" value="ERROR" />
-            <option name="myVal" value="300" />
+            <option name="myVal" value="400" />
           </error>
           <warning>
             <option name="myName" value="WARNING" />
-            <option name="myVal" value="200" />
+            <option name="myVal" value="300" />
           </warning>
           <information>
             <option name="myName" value="INFO" />
-            <option name="myVal" value="100" />
+            <option name="myVal" value="200" />
           </information>
           <server>
             <option name="myName" value="SERVER PROBLEM" />

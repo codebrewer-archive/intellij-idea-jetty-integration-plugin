@@ -6,7 +6,13 @@
   <version>##PLUGIN_VERSION##</version>
   <vendor email="mark@codebrewer.org" logo="/images/jetty16x16.png">Codebrewer</vendor>
   <change-notes>
-    <![CDATA[<b>Version 0.1.0 (Build 7)</b>
+    <![CDATA[<b>Version 0.1.1 (Build 10)</b>
+<ul>
+<li>Fixed: plugins.intellij.net shows no plug-in description.</li>
+<li>Fixed: jetty.bat fails when Jetty and IDEA are installed on different Windows drives.</li>
+<li>Fixed: jetty.sh is not executable after plug-in installation.</li>
+</ul>
+<b>Version 0.1.0 (Build 7)</b>
 <ul>
 <li>Initial release</li>
 </ul>]]>
