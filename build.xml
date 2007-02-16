@@ -162,6 +162,8 @@
       <zipfileset file="LICENSE" />
       <zipfileset file="NOTICE" />
       <zipfileset file="idea.build.properties" />
+      <zipfileset file="*.iml" />
+      <zipfileset file="*.ipr" />
       <zipfileset file="${build}/src/README" />
     </zip>
   </target>
