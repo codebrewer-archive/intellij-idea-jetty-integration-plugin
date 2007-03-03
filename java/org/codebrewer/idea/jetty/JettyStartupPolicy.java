@@ -49,11 +49,13 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
   @NonNls private static final String JAVA_VM_ENV_VARIABLE = "JAVA_OPTS";
   @NonNls private static final String JAR_PARAMETER = "-jar";
 
-  @NonNls private static String getDefaultJettyLauncherFileName() {
+  @NonNls private static String getDefaultJettyLauncherFileName()
+  {
     return SystemInfo.isWindows ? "jetty.bat" : "jetty.sh";
   }
 
-  private static File getEtcDirectory(final JettyModel jettyModel) throws RuntimeConfigurationException {
+  private static File getEtcDirectory(final JettyModel jettyModel) throws RuntimeConfigurationException
+  {
     return new File(new File(jettyModel.getHomeDirectory()), ETC_DIR);
   }
 
@@ -62,7 +64,7 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
     final String binDir =
 //        PathManager.getResourceRoot(JettyStartupPolicy.class, "/") + File.separator + ".." + File.separator + BIN_DIR;
 //    binDir.replaceAll("classes" + File.separator + ".." + File.separator, "");
-    PathManager.getPluginsPath() + File.separator + JettyManager.PLUGIN_NAME + File.separator + BIN_DIR; // Todo - fix 'Integration'
+        PathManager.getPluginsPath() + File.separator + JettyManager.PLUGIN_NAME + File.separator + BIN_DIR; // Todo - fix 'Integration'
 
     return new File(binDir, getDefaultJettyLauncherFileName());
   }
@@ -74,10 +76,10 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
       public ExecutableObject getDefaultScript(final CommonModel model)
       {
 //        try {
-          final File jettyLauncherFile = getJettyLauncherFile();
+        final File jettyLauncherFile = getJettyLauncherFile();
 //          final JettyModel jettyModel = ((JettyModel) model.getServerModel());
 //          return createJettyExecutable(model, jettyModel, null);
-          return new CommandLineExecutableObject(new String[]{jettyLauncherFile.getAbsolutePath()}, null);
+        return new CommandLineExecutableObject(new String[]{ jettyLauncherFile.getAbsolutePath() }, null);
 //        }
 //        catch (RuntimeConfigurationException e) {
 //          return null;
@@ -93,15 +95,13 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
       public ExecutableObject getDefaultScript(final CommonModel model)
       {
         final File jettyLauncherFile = getJettyLauncherFile();
-        return new CommandLineExecutableObject(new String[]{jettyLauncherFile.getAbsolutePath()}, null);
+        return new CommandLineExecutableObject(new String[]{ jettyLauncherFile.getAbsolutePath() }, null);
       }
     };
   }
 
   public EnvironmentHelper getEnvironmentHelper()
   {
-    // Todo - implement properly
-
     final EnvironmentHelper helper = new EnvironmentHelper()
     {
       public List<EnvironmentVariable> getAdditionalEnvironmentVariables(final CommonModel model)
@@ -118,20 +118,28 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
           else {
             final String javaHome = EnvironmentUtil.getEnviromentProperties().get(JAVA_HOME_ENV_PROPERTY);
 
-            if(javaHome != null) {
+            if (javaHome != null) {
               vars.add(new EnvironmentVariable(JAVA_HOME_ENV_PROPERTY, javaHome, true));
             }
           }
 
           final JettyModel jettyModel = (JettyModel) model.getServerModel();
-          vars.add(new EnvironmentVariable("JETTY_HOME", jettyModel.getHomeDirectory(), true));
+          vars.add(new EnvironmentVariable(JettyConstants.JETTY_HOME_ENV_VAR, jettyModel.getHomeDirectory(), true));
           final int stopPort = jettyModel.getStopPort();
           if (stopPort == 0) {
-            vars.add(new EnvironmentVariable("JETTY_OPTS", "-DSTOP.PORT=0 -jar start.jar", true));
+            final String[] configFilePaths = jettyModel.getActiveConfigFilePaths();
+            final StringBuilder sb = new StringBuilder("-DSTOP.PORT=0 -jar start.jar");
+
+            for (int i = 0; i < configFilePaths.length; i++) {
+              final String configFilePath = configFilePaths[i];
+              sb.append(' ').append(configFilePath);
+            }
+
+            vars.add(new EnvironmentVariable(JettyConstants.JETTY_OPTS_ENV_VAR, sb.toString(), true));
           }
           else {
             final String stopKey = jettyModel.getStopKey();
-            vars.add(new EnvironmentVariable("JETTY_OPTS", "-DSTOP.PORT=" + stopPort + " -DSTOP.KEY=" + stopKey + " -jar start.jar --stop", true));
+            vars.add(new EnvironmentVariable(JettyConstants.JETTY_OPTS_ENV_VAR, "-DSTOP.PORT=" + stopPort + " -DSTOP.KEY=" + stopKey + " -jar start.jar --stop", true));
             jettyModel.setStopPort(0);
           }
         }
@@ -142,7 +150,8 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
         return vars;
       }
 
-      public String getDefaultJavaVmEnvVariableName(final CommonModel model) {
+      public String getDefaultJavaVmEnvVariableName(final CommonModel model)
+      {
         return JAVA_VM_ENV_VARIABLE;
       }
     };

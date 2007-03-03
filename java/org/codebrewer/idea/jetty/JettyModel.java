@@ -36,6 +36,7 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.WriteExternalException;
 import org.jdom.Element;
 import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -49,19 +50,51 @@ import java.util.Set;
  */
 public class JettyModel implements ServerModel
 {
+  private static final String EXCEPTION_TEXT_NO_APPLICATION_SERVER = "exception.text.application.server.not.specified";
+
   private CommonModel commonModel;
   private String stopKey;
   private int stopPort;
 
-  private File getDefaultServerConfigurationFile() throws RuntimeConfigurationException
+  public @NotNull File[] getActiveConfigFiles() throws RuntimeConfigurationError
   {
-    return new File(new File(
-        JettyUtil.baseConfigDir(getSourceBaseDirectoryPath())), JettyConstants.JETTY_XML_FILE_NAME);
+    final ApplicationServer applicationServer = commonModel.getApplicationServer();
+
+    if (applicationServer == null) {
+      throw new RuntimeConfigurationError(JettyBundle.message(EXCEPTION_TEXT_NO_APPLICATION_SERVER));
+    }
+
+    final JettyPersistentData jettyPersistentData = ((JettyPersistentData) applicationServer.getPersistentData());
+    final List<JettyPersistentData.JettyConfigurationFile> configFiles =
+        jettyPersistentData.getJettyConfigurationFiles();
+    final List<JettyPersistentData.JettyConfigurationFile> activeConfigFiles =
+        new ArrayList<JettyPersistentData.JettyConfigurationFile>();
+
+    for (final JettyPersistentData.JettyConfigurationFile configFile : configFiles) {
+      if (configFile.isActive()) {
+        activeConfigFiles.add(configFile);
+      }
+    }
+
+    final File[] result = new File[activeConfigFiles.size()];
+
+    for (int i = 0; i < activeConfigFiles.size(); i++) {
+      result[i] = activeConfigFiles.get(i).getFile();
+    }
+
+    return result;
   }
 
-  private String getSourceBaseDirectoryPath() throws RuntimeConfigurationException
+  public @NotNull String[] getActiveConfigFilePaths() throws RuntimeConfigurationError
   {
-    return getHomeDirectory();
+    final File[] activeConfigFiles = getActiveConfigFiles();
+    final String[] result = new String[activeConfigFiles.length];
+
+    for (int i = 0; i < activeConfigFiles.length; i++) {
+      result[i] = activeConfigFiles[i].getAbsolutePath();
+    }
+
+    return result;
   }
 
   public String getHomeDirectory() throws RuntimeConfigurationException
@@ -69,7 +102,7 @@ public class JettyModel implements ServerModel
     final ApplicationServer applicationServer = commonModel.getApplicationServer();
 
     if (applicationServer == null) {
-      throw new RuntimeConfigurationError(JettyBundle.message("exception.text.application.server.not.specified"));
+      throw new RuntimeConfigurationError(JettyBundle.message(EXCEPTION_TEXT_NO_APPLICATION_SERVER));
     }
 
     final JettyPersistentData jettyPersistentData = ((JettyPersistentData) applicationServer.getPersistentData());
@@ -139,7 +172,7 @@ public class JettyModel implements ServerModel
     // Todo - add context?
 
     final StringBuilder result = new StringBuilder();
-    result.append(JettyConstants.HTTP_PROTOCOL);
+    result.append(JettyConstants.HTTP_SCHEME);
     result.append(commonModel.getHost());
     result.append(':');
     result.append(String.valueOf(commonModel.getPort()));
@@ -212,7 +245,7 @@ public class JettyModel implements ServerModel
   public int getLocalPort()
   {
     try {
-      return JettyUtil.getPort(getDefaultServerConfigurationFile());
+      return JettyUtil.getPort(getActiveConfigFiles());
     }
     catch (RuntimeConfigurationException e) {
       return getDefaultPort();

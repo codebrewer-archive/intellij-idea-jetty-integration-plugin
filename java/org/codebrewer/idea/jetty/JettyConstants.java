@@ -30,6 +30,18 @@ public class JettyConstants
   @NonNls public static final String JETTY_CONFIG_DIRECTORY_NAME = "etc";
 
   /**
+   * The name of the environment variable conventionally used to indicate the
+   * location of a Jetty installation.
+   */
+  @NonNls public static final String JETTY_HOME_ENV_VAR = "JETTY_HOME";
+
+  /**
+   * The name of the environment variable conventionally used to pass options to
+   * a Jetty startup script.
+   */
+  @NonNls public static final String JETTY_OPTS_ENV_VAR = "JETTY_OPTS";
+
+  /**
    * The name of the Jetty JSP 2.1 lib directory, relative to the Jetty
    * installation lib directory.
    */
@@ -40,9 +52,37 @@ public class JettyConstants
    * directory.
    */
   @NonNls public static final String JETTY_LIB_DIRECTORY_NAME = "lib";
-  @NonNls public static final String JETTY_XML_FILE_NAME = "jetty.xml";
+
+  /**
+   * The TCP port number on which Jetty by default listens for client
+   * connections.
+   */
   public static final int DEFAULT_PORT = 8080;
-  @NonNls protected static final String HTTP_PROTOCOL = "http://";
+
+  /**
+   * The URL prefix for the file scheme.
+   */
+  @NonNls public static final String FILE_SCHEME = "file://";
+
+  /**
+   * The URL prefix for the HTTP scheme.
+   */
+  @NonNls public static final String HTTP_SCHEME = "http://";
+
+  /**
+   * The name of the root element in a valid Jetty XML configuration file.
+   */
+  @NonNls public static final String JETTY_DOCTYPE_ELEMENT_NAME = "Configure";
+
+  /**
+   * The public ID of the DOCTYPE declaration in a valid Jetty XML configuration file.
+   */
+  @NonNls public static final String JETTY_DOCTYPE_PUBLIC_ID = "-//Mort Bay Consulting//DTD Configure//EN";
+
+  /**
+   * The system ID of the DOCTYPE declaration in a valid Jetty XML configuration file.
+   */
+  @NonNls public static final String JETTY_DOCTYPE_SYSTEM_ID = "http://jetty.mortbay.org/configure.dtd";
 
   private JettyConstants()
   {
