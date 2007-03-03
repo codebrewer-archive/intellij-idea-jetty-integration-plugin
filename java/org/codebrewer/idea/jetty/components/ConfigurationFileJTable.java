@@ -18,6 +18,7 @@ package org.codebrewer.idea.jetty.components;
 import com.intellij.ui.BooleanTableCellEditor;
 import com.intellij.ui.BooleanTableCellRenderer;
 
+import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JCheckBox;
 import javax.swing.JTable;
@@ -41,7 +42,8 @@ import javax.swing.table.TableModel;
  */
 public class ConfigurationFileJTable extends JTable
 {
-  private static final int FILE_ACTIVE_COLUMN_INDEX = 1;
+  static final int FILE_PATH_COLUMN_INDEX = 0;
+  static final int FILE_ACTIVE_COLUMN_INDEX = 1;
 
   private final TableCellEditor booleanCellEditor = new BooleanTableCellEditor(false);
   private final TableCellRenderer booleanCellRenderer = new BooleanTableCellRenderer();
@@ -53,11 +55,15 @@ public class ConfigurationFileJTable extends JTable
 
   @Override public TableCellEditor getCellEditor(final int row, final int column)
   {
-    if (column == FILE_ACTIVE_COLUMN_INDEX) {
-      return booleanCellEditor;
-    }
-    else {
-      return super.getCellEditor(row, column);
+    switch (column) {
+      case FILE_PATH_COLUMN_INDEX:
+        final DefaultCellEditor result = (DefaultCellEditor) super.getCellEditor(row, column);
+        result.setClickCountToStart(Integer.MAX_VALUE);
+        return result;
+      case FILE_ACTIVE_COLUMN_INDEX:
+        return booleanCellEditor;
+      default:
+        return super.getCellEditor(row, column);
     }
   }
 

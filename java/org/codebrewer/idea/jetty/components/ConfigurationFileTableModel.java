@@ -167,7 +167,7 @@ public class ConfigurationFileTableModel extends AbstractTableModel
 
   @Override public boolean isCellEditable(final int rowIndex, final int columnIndex)
   {
-    return columnIndex == 1;
+    return true;
   }
 
   public void setValueAt(final Object aValue, final int rowIndex, final int columnIndex)
@@ -176,7 +176,7 @@ public class ConfigurationFileTableModel extends AbstractTableModel
       final JettyPersistentData.JettyConfigurationFile configurationFile = configurationFiles.get(rowIndex);
 
       switch (columnIndex) {
-        case 0:
+        case ConfigurationFileJTable.FILE_PATH_COLUMN_INDEX:
           try {
             configurationFile.setPath((String) aValue);
           }
@@ -184,7 +184,7 @@ public class ConfigurationFileTableModel extends AbstractTableModel
             // Todo - post a dialog
           }
           break;
-        case 1:
+        case ConfigurationFileJTable.FILE_ACTIVE_COLUMN_INDEX:
           configurationFile.setActive((Boolean) aValue);
           break;
         default:
