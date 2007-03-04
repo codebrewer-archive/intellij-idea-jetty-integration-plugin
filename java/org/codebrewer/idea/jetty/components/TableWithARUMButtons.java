@@ -55,8 +55,8 @@ import javax.swing.event.ListSelectionListener;
 public abstract class TableWithARUMButtons extends DisposableComponent implements CommittablePanel
 {
   protected final JButton addButton;
-  private final JButton removeButton;
-  private final JButton updateButton;
+  protected final JButton removeButton;
+  protected final JButton updateButton;
   protected final JButton moveUpButton;
   protected final JButton moveDownButton;
   protected final JTable table;

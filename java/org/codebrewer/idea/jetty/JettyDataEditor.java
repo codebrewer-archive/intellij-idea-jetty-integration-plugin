@@ -151,7 +151,7 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
     {
       public void textChanged(final DocumentEvent event)
       {
-        update();
+        update(true);
       }
     });
     northPanel.add(jettyHomeField,
@@ -175,7 +175,7 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
     panel.add(jettyConfigurationFileTable.getComponent(), BorderLayout.CENTER);
   }
 
-  private void update()
+  private void update(final boolean updateConfigFiles)
   {
     final String homeDir = jettyHomeField.getText();
 
@@ -191,7 +191,7 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
         jettyVersionLabel.setText(jettyVersion);
         jettyVersionLabel.setForeground(Color.BLACK);
 
-        if (jettyConfigurationFileTable.getConfigurationFiles().size() == 0) {
+        if (updateConfigFiles) {
           fillConfigurationFileTable(JettyUtil.baseConfigDir(homeDir));
         }
       }
@@ -283,7 +283,7 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
     jettyHomeField.setText(s.getJettyHome().replace('/', File.separatorChar));
     final List<JettyPersistentData.JettyConfigurationFile> configurationFiles = s.getJettyConfigurationFiles();
     jettyConfigurationFileTable.setConfigurationFiles(configurationFiles);
-    update();
+    update(false);
   }
 
   private class ServerConfigurationFileTable extends TableWithARUMButtons
@@ -341,7 +341,8 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
       }
       else if (jettyHomeField.getText().length() > 0) {
         initialSelection = VirtualFileManager.getInstance().findFileByUrl(
-            JettyConstants.FILE_SCHEME + jettyHomeField.getText());
+            JettyConstants.FILE_SCHEME +
+                JettyUtil.baseConfigDir(jettyHomeField.getText()).replace(File.separatorChar, '/'));
       }
       else {
         initialSelection = null;
@@ -368,6 +369,7 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
 
           final int lastRowIndex = model.getRowCount() - 1;
           table.setRowSelectionInterval(lastRowIndex, lastRowIndex);
+          ensureRowVisible(lastRowIndex);
         }
       }
     }
@@ -380,7 +382,13 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
       model.moveConfigurationFileDown(selectedRow);
       table.setRowSelectionInterval(selectedRow + 1, selectedRow + 1);
       ensureRowVisible(selectedRow + 1);
-      moveDownButton.requestFocus();
+
+      if (selectedRow != model.getRowCount() - 2) {
+        moveDownButton.requestFocusInWindow();
+      }
+      else {
+        moveUpButton.requestFocusInWindow();
+      }
     }
 
     protected void doMoveUp()
@@ -390,8 +398,14 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
 
       model.moveConfigurationFileUp(selectedRow);
       table.setRowSelectionInterval(selectedRow - 1, selectedRow - 1);
-      ensureRowVisible(selectedRow + 1);
-      moveUpButton.requestFocus();
+      ensureRowVisible(selectedRow - 1);
+
+      if (selectedRow != 1) {
+        moveUpButton.requestFocusInWindow();
+      }
+      else {
+        moveDownButton.requestFocusInWindow();
+      }
     }
 
     protected void doRemove()
@@ -410,6 +424,10 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
       if (rowCount > 0) {
         final int rowToSelect = Math.min(rowCount - 1, selectedRows[selectedRows.length - 1]);
         table.setRowSelectionInterval(rowToSelect, rowToSelect);
+        removeButton.requestFocusInWindow();
+      }
+      else {
+        addButton.requestFocusInWindow();
       }
     }
 
@@ -418,7 +436,8 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
       final int selectedRow = table.getSelectedRow();
       final String configurationFilePath = (String) table.getValueAt(selectedRow, 0);
       final VirtualFile initialSelection =
-          VirtualFileManager.getInstance().findFileByUrl(JettyConstants.FILE_SCHEME + configurationFilePath);
+          VirtualFileManager.getInstance().findFileByUrl(
+              JettyConstants.FILE_SCHEME + configurationFilePath.replace(File.separatorChar, '/'));
       final FileChooserDialog fileChooserDialog =
           FileChooserFactory.getInstance().createFileChooser(JETTY_CONFIGURATION_FILE_CHOOSER_DESCRIPTOR, project);
       final VirtualFile[] chosenFile = fileChooserDialog.choose(initialSelection, project);
