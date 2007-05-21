@@ -180,7 +180,7 @@
         <include name="**/*" />
       </fileset>
     </delete>
-    <unzip src="${dist}/${project.name.compressed}.zip" dest="${idea.plugins.sandbox.home}/plugins" />
+    <unzip src="${staging}/${project.name.compressed}.zip" dest="${idea.plugins.sandbox.home}/plugins" />
   </target>
 
 </project>
