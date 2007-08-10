@@ -37,7 +37,13 @@ import org.jetbrains.annotations.NonNls;
 public class JettyServerInstance extends DefaultServerInstance
 {
   // Todo - investigate Jetty startup messages (at least, don't restrict to 6.1)
-  @NonNls protected static final String STARTING_MESSAGE = "jetty-6.1.";
+  @NonNls
+  protected static final String STARTING_MESSAGE = "jetty-6.1.";
+
+  private static boolean isStartingMessage(final String text)
+  {
+    return text.contains(STARTING_MESSAGE);
+  }
 
   private boolean isStartedUp = false;
 
@@ -46,11 +52,7 @@ public class JettyServerInstance extends DefaultServerInstance
     super(runConfiguration);
   }
 
-  private boolean isStartingMessage(final String text)
-  {
-    return text.indexOf(STARTING_MESSAGE) >= 0;
-  }
-
+  @Override
   public void start(final ProcessHandler processHandler)
   {// (JettyDeploymentProvider) getServerModel().getDeploymentProvider()
     super.start(processHandler);
@@ -59,12 +61,14 @@ public class JettyServerInstance extends DefaultServerInstance
     final JettyModel jettyModel = (JettyModel) getServerModel();
     DebuggerManager.getInstance(jettyModel.getProject()).addDebugProcessListener(processHandler, new DebugProcessAdapter()
     {
-      PositionManager positionManager;
+      private PositionManager positionManager;
 
+      @Override
       public void processAttached(final DebugProcess process)
       {
-        positionManager = new DefaultJSPPositionManager(process, getScopeModules(getCommonModel()))
+        positionManager = new DefaultJSPPositionManager(process, getScopeFacets(getCommonModel()))
         {
+          @Override
           protected String getGeneratedClassesPackage()
           {
             // Todo - what's appropriate here?  user-configurable?
@@ -80,6 +84,7 @@ public class JettyServerInstance extends DefaultServerInstance
       {
         private int stdoutLinesRead = 0;
 
+        @Override
         public void onTextAvailable(final ProcessEvent event, final Key outputType)
         {
           final String text = event.getText();
@@ -108,6 +113,7 @@ public class JettyServerInstance extends DefaultServerInstance
     }
   }
 
+  @Override
   public boolean isConnected()
   {
     return isStartedUp && super.isConnected();

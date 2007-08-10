@@ -15,8 +15,9 @@
  */
 package org.codebrewer.idea.jetty;
 
-import com.intellij.javaee.JavaeeModuleProperties;
+import com.intellij.facet.pointers.FacetPointer;
 import com.intellij.javaee.deployment.DeploymentModel;
+import com.intellij.javaee.facet.JavaeeFacet;
 import com.intellij.javaee.run.configuration.CommonModel;
 
 /**
@@ -27,8 +28,9 @@ public class JettyModuleDeploymentModel extends DeploymentModel
 {
   private String contextPath = "/";
 
-  public JettyModuleDeploymentModel(CommonModel project, JavaeeModuleProperties moduleProperties) {
-    super(project, moduleProperties);
+  public JettyModuleDeploymentModel(CommonModel project, FacetPointer<JavaeeFacet> facetPointer)
+  {
+    super(project, facetPointer);
   }
 
   public String getContextPath()

@@ -42,6 +42,9 @@
       <include name="jdom.jar" />
       <include name="openapi.jar" />
     </fileset>
+    <fileset dir="${idea.home}/plugins/JavaEE/lib">
+      <include name="javaee-openapi.jar" />
+    </fileset>
   </path>
 
   <target name="build"

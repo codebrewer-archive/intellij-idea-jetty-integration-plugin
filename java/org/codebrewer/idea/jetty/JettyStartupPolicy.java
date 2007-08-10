@@ -16,10 +16,10 @@
 package org.codebrewer.idea.jetty;
 
 import com.intellij.execution.configurations.RuntimeConfigurationException;
+import com.intellij.execution.util.EnvironmentVariable;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.javaee.run.localRun.CommandLineExecutableObject;
 import com.intellij.javaee.run.localRun.EnvironmentHelper;
-import com.intellij.javaee.run.localRun.EnvironmentVariable;
 import com.intellij.javaee.run.localRun.ExecutableObject;
 import com.intellij.javaee.run.localRun.ExecutableObjectStartupPolicy;
 import com.intellij.javaee.run.localRun.ScriptsHelper;
@@ -42,14 +42,21 @@ import java.util.List;
  */
 public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
 {
-  @NonNls private static final String START_JAR_NAME = "start.jar";
-  @NonNls private static final String BIN_DIR = "bin";
-  @NonNls private static final String ETC_DIR = "etc";
-  @NonNls private static final String JAVA_HOME_ENV_PROPERTY = "JAVA_HOME";
-  @NonNls private static final String JAVA_VM_ENV_VARIABLE = "JAVA_OPTS";
-  @NonNls private static final String JAR_PARAMETER = "-jar";
+  @NonNls
+  private static final String START_JAR_NAME = "start.jar";
+  @NonNls
+  private static final String BIN_DIR = "bin";
+  @NonNls
+  private static final String ETC_DIR = "etc";
+  @NonNls
+  private static final String JAVA_HOME_ENV_PROPERTY = "JAVA_HOME";
+  @NonNls
+  private static final String JAVA_VM_ENV_VARIABLE = "JAVA_OPTS";
+  @NonNls
+  private static final String JAR_PARAMETER = "-jar";
 
-  @NonNls private static String getDefaultJettyLauncherFileName()
+  @NonNls
+  private static String getDefaultJettyLauncherFileName()
   {
     return SystemInfo.isWindows ? "jetty.bat" : "jetty.sh";
   }
@@ -64,7 +71,7 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
     final String binDir =
 //        PathManager.getResourceRoot(JettyStartupPolicy.class, "/") + File.separator + ".." + File.separator + BIN_DIR;
 //    binDir.replaceAll("classes" + File.separator + ".." + File.separator, "");
-        PathManager.getPluginsPath() + File.separator + JettyManager.PLUGIN_NAME + File.separator + BIN_DIR; // Todo - fix 'Integration'
+      PathManager.getPluginsPath() + File.separator + JettyManager.PLUGIN_NAME + File.separator + BIN_DIR; // Todo - fix 'Integration'
 
     return new File(binDir, getDefaultJettyLauncherFileName());
   }
@@ -104,6 +111,7 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
   {
     final EnvironmentHelper helper = new EnvironmentHelper()
     {
+      @Override
       public List<EnvironmentVariable> getAdditionalEnvironmentVariables(final CommonModel model)
       {
         final List<EnvironmentVariable> vars = new ArrayList<EnvironmentVariable>();
@@ -113,7 +121,7 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
 
           if (projectJdk != null) {
             vars.add(new EnvironmentVariable(
-                JAVA_HOME_ENV_PROPERTY, projectJdk.getHomePath().replace('/', File.separatorChar), true));
+              JAVA_HOME_ENV_PROPERTY, projectJdk.getHomePath().replace('/', File.separatorChar), true));
           }
           else {
             final String javaHome = EnvironmentUtil.getEnviromentProperties().get(JAVA_HOME_ENV_PROPERTY);
@@ -130,8 +138,7 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
             final String[] configFilePaths = jettyModel.getActiveConfigFilePaths();
             final StringBuilder sb = new StringBuilder("-DSTOP.PORT=0 -jar start.jar");
 
-            for (int i = 0; i < configFilePaths.length; i++) {
-              final String configFilePath = configFilePaths[i];
+            for (final String configFilePath : configFilePaths) {
               sb.append(' ').append(configFilePath);
             }
 
@@ -150,6 +157,7 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
         return vars;
       }
 
+      @Override
       public String getDefaultJavaVmEnvVariableName(final CommonModel model)
       {
         return JAVA_VM_ENV_VARIABLE;

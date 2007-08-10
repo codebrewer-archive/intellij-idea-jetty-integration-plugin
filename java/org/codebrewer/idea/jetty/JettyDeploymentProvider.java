@@ -15,12 +15,13 @@
  */
 package org.codebrewer.idea.jetty;
 
-import com.intellij.javaee.JavaeeModuleProperties;
+import com.intellij.facet.pointers.FacetPointer;
 import com.intellij.javaee.deployment.DeploymentManager;
 import com.intellij.javaee.deployment.DeploymentMethod;
 import com.intellij.javaee.deployment.DeploymentModel;
 import com.intellij.javaee.deployment.DeploymentProvider;
 import com.intellij.javaee.deployment.DeploymentStatus;
+import com.intellij.javaee.facet.JavaeeFacet;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.javaee.serverInstances.J2EEServerInstance;
 import com.intellij.openapi.options.SettingsEditor;
@@ -40,7 +41,6 @@ public class JettyDeploymentProvider implements DeploymentProvider
 
   public void doDeploy(final Project project, final J2EEServerInstance instance, final DeploymentModel model)
   {
-//    final Module module = model.getModuleProperties().getModule();
 //    final JettyModuleDeploymentModel jettyModel = (JettyModuleDeploymentModel) model;
 //    try {
 //      final JettyModel serverModel = (JettyModel)model.getServerModel();
@@ -59,19 +59,19 @@ public class JettyDeploymentProvider implements DeploymentProvider
 //      }
 //    }
 //    catch (ExecutionException e) {
-//      Messages.showErrorDialog(project, e.getMessage(), JettyBundle.message("message.text.error.deploying.module", module.getName()));
+//      Messages.showErrorDialog(project, e.getMessage(), JettyBundle.message("message.text.error.deploying.facet", model.getFacet().getName()));
 //      setDeploymentStatus(instance, jettyModel, DeploymentStatus.FAILED);
 //    }
   }
 
-  public DeploymentModel createNewDeploymentModel(CommonModel configuration, JavaeeModuleProperties j2eeModuleProperties)
+  public DeploymentModel createNewDeploymentModel(CommonModel configuration, FacetPointer<JavaeeFacet> javaeeFacetPointer)
   {
-    return new JettyModuleDeploymentModel(configuration, j2eeModuleProperties);
+    return new JettyModuleDeploymentModel(configuration, javaeeFacetPointer);
   }
 
-  public SettingsEditor<DeploymentModel> createAdditionalDeploymentSettingsEditor(CommonModel configuration, JavaeeModuleProperties moduleProperties)
+  public SettingsEditor<DeploymentModel> createAdditionalDeploymentSettingsEditor(CommonModel configuration, JavaeeFacet javaeeFacet)
   {
-    return new JettyDeploymentSettingsEditor(configuration, moduleProperties);
+    return new JettyDeploymentSettingsEditor(configuration, javaeeFacet);
   }
 
   public void startUndeploy(J2EEServerInstance activeInstance, DeploymentModel model)
@@ -84,15 +84,16 @@ public class JettyDeploymentProvider implements DeploymentProvider
     // Todo - implement properly
     final CommonModel configuration = instance.getCommonModel();
     final JettyModel serverModel = ((JettyModel) configuration.getServerModel());
-    final JavaeeModuleProperties item = model.getModuleProperties();
+    final JavaeeFacet facet = model.getFacet();
     final DeploymentManager deploymentManager = DeploymentManager.getInstance(serverModel.getProject());
 
     // Dummy for now
     //
-    deploymentManager.setDeploymentStatus(item, DeploymentStatus.UNKNOWN, configuration, instance);
+    deploymentManager.setDeploymentStatus(facet, DeploymentStatus.UNKNOWN, configuration, instance);
   }
 
-  @NonNls public String getHelpId()
+  @NonNls
+  public String getHelpId()
   {
     return null;
   }

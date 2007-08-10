@@ -19,14 +19,15 @@ import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.execution.configurations.RuntimeConfigurationException;
 import com.intellij.execution.process.ProcessHandler;
-import com.intellij.javaee.JavaeeModuleProperties;
 import com.intellij.javaee.appServerIntegrations.ApplicationServer;
 import com.intellij.javaee.deployment.DeploymentProvider;
+import com.intellij.javaee.facet.JavaeeFacetUtil;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.javaee.run.configuration.ServerModel;
 import com.intellij.javaee.run.execution.DefaultOutputProcessor;
 import com.intellij.javaee.run.execution.OutputProcessor;
 import com.intellij.javaee.serverInstances.J2EEServerInstance;
+import com.intellij.javaee.web.facet.WebFacet;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
@@ -56,7 +57,8 @@ public class JettyModel implements ServerModel
   private String stopKey;
   private int stopPort;
 
-  public @NotNull File[] getActiveConfigFiles() throws RuntimeConfigurationError
+  @NotNull
+  public File[] getActiveConfigFiles() throws RuntimeConfigurationError
   {
     final ApplicationServer applicationServer = commonModel.getApplicationServer();
 
@@ -66,9 +68,9 @@ public class JettyModel implements ServerModel
 
     final JettyPersistentData jettyPersistentData = ((JettyPersistentData) applicationServer.getPersistentData());
     final List<JettyPersistentData.JettyConfigurationFile> configFiles =
-        jettyPersistentData.getJettyConfigurationFiles();
+      jettyPersistentData.getJettyConfigurationFiles();
     final List<JettyPersistentData.JettyConfigurationFile> activeConfigFiles =
-        new ArrayList<JettyPersistentData.JettyConfigurationFile>();
+      new ArrayList<JettyPersistentData.JettyConfigurationFile>();
 
     for (final JettyPersistentData.JettyConfigurationFile configFile : configFiles) {
       if (configFile.isActive()) {
@@ -85,7 +87,8 @@ public class JettyModel implements ServerModel
     return result;
   }
 
-  public @NotNull String[] getActiveConfigFilePaths() throws RuntimeConfigurationError
+  @NotNull
+  public String[] getActiveConfigFilePaths() throws RuntimeConfigurationError
   {
     final File[] activeConfigFiles = getActiveConfigFiles();
     final String[] result = new String[activeConfigFiles.length];
@@ -171,7 +174,7 @@ public class JettyModel implements ServerModel
   {
     // Todo - add context?
 
-    final StringBuilder result = new StringBuilder();
+    final StringBuilder result = new StringBuilder(128);
     result.append(JettyConstants.HTTP_SCHEME);
     result.append(commonModel.getHost());
     result.append(':');
@@ -189,7 +192,7 @@ public class JettyModel implements ServerModel
   }
 
   public OutputProcessor createOutputProcessor(
-      final ProcessHandler j2EEOSProcessHandlerWrapper, final J2EEServerInstance serverInstance)
+    final ProcessHandler j2EEOSProcessHandlerWrapper, final J2EEServerInstance serverInstance)
   {
     return new DefaultOutputProcessor(j2EEOSProcessHandlerWrapper);
   }
@@ -212,17 +215,13 @@ public class JettyModel implements ServerModel
     final Set<String> contexts = new HashSet<String>();
     final Module[] modules = commonModel.getModules();
 
-    for (final Module module : modules) {
-      final JavaeeModuleProperties properties = JavaeeModuleProperties.getInstance(module);
+    for (final WebFacet webFacet : JavaeeFacetUtil.getInstance().getJavaeeFacets(WebFacet.ID, modules)) {
+      final JettyModuleDeploymentModel model =
+        (JettyModuleDeploymentModel) commonModel.getDeploymentModel(webFacet);
 
-      if (properties != null) {
-        final JettyModuleDeploymentModel model =
-            (JettyModuleDeploymentModel) commonModel.getDeploymentModel(properties);
-
-        if (model.DEPLOY && !contexts.add(model.getContextPath())) {
-          throw new RuntimeConfigurationError(
-              JettyBundle.message("error.text.duplicated.context.path", model.getContextPath()));
-        }
+      if (model.DEPLOY && !contexts.add(model.getContextPath())) {
+        throw new RuntimeConfigurationError(
+          JettyBundle.message("error.text.duplicated.context.path", model.getContextPath()));
       }
     }
   }
@@ -232,11 +231,13 @@ public class JettyModel implements ServerModel
     return JettyConstants.DEFAULT_PORT;
   }
 
+  @SuppressWarnings({ "ParameterNameDiffersFromOverriddenParameter" })
   public void setCommonModel(final CommonModel commonModel)
   {
     this.commonModel = commonModel;
   }
 
+  @Override
   public JettyModel clone() throws CloneNotSupportedException
   {
     return (JettyModel) super.clone();
@@ -247,7 +248,7 @@ public class JettyModel implements ServerModel
     try {
       return JettyUtil.getPort(getActiveConfigFiles());
     }
-    catch (RuntimeConfigurationException e) {
+    catch (RuntimeConfigurationException ignore) {
       return getDefaultPort();
     }
   }

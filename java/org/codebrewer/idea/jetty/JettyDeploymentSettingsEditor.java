@@ -15,8 +15,9 @@
  */
 package org.codebrewer.idea.jetty;
 
-import com.intellij.javaee.JavaeeModuleProperties;
+import com.intellij.facet.pointers.FacetPointersManager;
 import com.intellij.javaee.deployment.DeploymentModel;
+import com.intellij.javaee.facet.JavaeeFacet;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
@@ -34,30 +35,37 @@ import javax.swing.JLabel;
  */
 public class JettyDeploymentSettingsEditor extends SettingsEditor<DeploymentModel>
 {
-  public JettyDeploymentSettingsEditor(final CommonModel configuration, final JavaeeModuleProperties moduleProperties)
+  public JettyDeploymentSettingsEditor(final CommonModel configuration, final JavaeeFacet facet)
   {
-    super(new Factory<DeploymentModel>() {
-      public JettyModuleDeploymentModel create() {
-        return new JettyModuleDeploymentModel(configuration, moduleProperties);
+    super(new Factory<DeploymentModel>()
+    {
+      public JettyModuleDeploymentModel create()
+      {
+        final FacetPointersManager manager = FacetPointersManager.getInstance(facet.getModule().getProject());
+        return new JettyModuleDeploymentModel(configuration, manager.create(facet));
       }
     });
   }
 
+  @Override
   protected void resetEditorFrom(final DeploymentModel s)
   {
   }
 
+  @Override
   protected void applyEditorTo(final DeploymentModel s) throws ConfigurationException
   {
   }
 
   @NotNull
+  @Override
   protected JComponent createEditor()
   {
 //    return new JLabel("JettyDeploymentSettingsEditor");
     return new JLabel();
   }
 
+  @Override
   protected void disposeEditor()
   {
   }

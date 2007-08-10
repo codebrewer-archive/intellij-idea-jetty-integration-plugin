@@ -4,6 +4,7 @@
   <id>Jetty Integration</id>
   <description>Allows configuration and use of the Jetty webserver directly from IntelliJ IDEA, for running/debugging web applications.  Hot un/re/deployment is not yet implemented.</description>
   <version>##PLUGIN_VERSION##</version>
+  <depends>com.intellij.javaee</depends>
   <vendor email="mark@codebrewer.org" logo="/images/jetty16x16.png">Codebrewer</vendor>
   <change-notes>
     <![CDATA[<b>Version 0.2.0 (Build 18)</b>

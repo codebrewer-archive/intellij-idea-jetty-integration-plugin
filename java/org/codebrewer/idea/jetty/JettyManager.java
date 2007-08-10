@@ -15,20 +15,24 @@
  */
 package org.codebrewer.idea.jetty;
 
+import com.intellij.facet.FacetTypeId;
 import com.intellij.ide.fileTemplates.FileTemplateDescriptor;
 import com.intellij.ide.fileTemplates.FileTemplateGroupDescriptor;
 import com.intellij.javaee.appServerIntegrations.AppServerIntegration;
 import com.intellij.javaee.appServerIntegrations.ApplicationServerHelper;
 import com.intellij.javaee.deployment.DeploymentProvider;
+import com.intellij.javaee.facet.JavaeeFacet;
+import com.intellij.javaee.facet.JavaeeFacetUtil;
+import com.intellij.javaee.web.facet.WebFacet;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileTypes.StdFileTypes;
-import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.util.IconLoader;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.Icon;
+import java.util.Collection;
 
 /**
  * @author Mark Scott
@@ -38,9 +42,11 @@ public class JettyManager extends AppServerIntegration
 {
   private static final Icon ICON_JETTY = IconLoader.getIcon("/images/jetty16x16.png");
   private static final Icon ICON_JCOLON = IconLoader.getIcon("/images/jcolon16x16.png");
-  @NonNls private static final String JETTY_6_1_X = "6.1.x";
+  @NonNls
+  private static final String JETTY_6_1_X = "6.1.x";
 
-  @NonNls public static final String PLUGIN_NAME = "JettyIntegration";
+  @NonNls
+  public static final String PLUGIN_NAME = "JettyIntegration";
 
   public static Icon getIcon()
   {
@@ -60,18 +66,21 @@ public class JettyManager extends AppServerIntegration
     return deploymentProvider;
   }
 
-  public @Nullable ApplicationServerHelper getApplicationServerHelper()
+  @Nullable
+  @Override
+  public ApplicationServerHelper getApplicationServerHelper()
   {
     return applicationServerHelper;
   }
 
+  @Override
   public FileTemplateGroupDescriptor getFileTemplatesDescriptor()
   {
     final FileTemplateGroupDescriptor group =
-        new FileTemplateGroupDescriptor(JettyBundle.message("label.version", JETTY_6_1_X), null);
+      new FileTemplateGroupDescriptor(JettyBundle.message("label.version", JETTY_6_1_X), null);
 
     final FileTemplateGroupDescriptor root =
-        new FileTemplateGroupDescriptor(JettyBundle.message("templates.group.title"), getIcon());
+      new FileTemplateGroupDescriptor(JettyBundle.message("templates.group.title"), getIcon());
 
     group.addTemplate(new FileTemplateDescriptor("jetty-context.xml", StdFileTypes.XML.getIcon()));
     root.addTemplate(group);
@@ -79,21 +88,26 @@ public class JettyManager extends AppServerIntegration
     return root;
   }
 
+  @Override
   public String getPresentableName()
   {
     return JettyBundle.message("jetty.server.presentable.name");
   }
 
-  @NotNull public ModuleType[] getSupportedModuleTypes()
+  @NotNull
+  @Override
+  public Collection<FacetTypeId<? extends JavaeeFacet>> getSupportedFacetTypes()
   {
-    return new ModuleType[]{ ModuleType.WEB };
+    return JavaeeFacetUtil.getInstance().getSingletonCollection(WebFacet.ID);
   }
 
   public void disposeComponent()
   {
   }
 
-  @NonNls @NotNull public String getComponentName()
+  @NonNls
+  @NotNull
+  public String getComponentName()
   {
     return getClass().getName();
   }
