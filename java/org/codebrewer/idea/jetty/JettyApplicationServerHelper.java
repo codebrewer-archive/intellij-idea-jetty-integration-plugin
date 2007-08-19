@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NonNls;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Mark Scott
@@ -31,7 +32,8 @@ import java.util.ArrayList;
  */
 public class JettyApplicationServerHelper implements ApplicationServerHelper
 {
-  @NonNls protected static final String JSP_API_2_1_JAR = "jsp-api-2.1.jar";
+  @NonNls
+  protected static final String JSP_API_2_1_JAR = "jsp-api-2.1.jar";
 
   public ApplicationServerPersistentDataEditor createConfigurable()
   {
@@ -44,26 +46,27 @@ public class JettyApplicationServerHelper implements ApplicationServerHelper
   }
 
   public ApplicationServerInfo getApplicationServerInfo(final ApplicationServerPersistentData persistentData)
-      throws CantFindApplicationServerJarsException
+    throws CantFindApplicationServerJarsException
   {
     final JettyPersistentData jettyPersistentData = (JettyPersistentData) persistentData;
 
     if (jettyPersistentData.getJettyHome().length() > 0 && !jettyPersistentData.getJettyVersion().startsWith("6.1")) {
       throw new CantFindApplicationServerJarsException(
-          JettyBundle.message("exception.text.unsupported.jetty.version", jettyPersistentData.getJettyVersion(), "6.1"));
+        JettyBundle.message("exception.text.unsupported.jetty.version", jettyPersistentData.getJettyVersion(), "6.1"));
     }
 
     final File jettyHome =
-        new File(jettyPersistentData.getJettyHome().replace('/', File.separatorChar)).getAbsoluteFile();
+      new File(jettyPersistentData.getJettyHome().replace('/', File.separatorChar)).getAbsoluteFile();
     final File jettyLib = new File(jettyHome, JettyConstants.JETTY_LIB_DIRECTORY_NAME);
 
     if (!jettyLib.isDirectory()) {
       throw new CantFindApplicationServerJarsException(
-          JettyBundle.message("message.text.cant.find.directory", jettyLib.getAbsolutePath()));
+        JettyBundle.message("message.text.cant.find.directory", jettyLib.getAbsolutePath()));
     }
 
-    final ArrayList<File> files = new ArrayList<File>();
+    final List<File> files = new ArrayList<File>();
     final File[] filesInLib = jettyLib.listFiles();
+
     if (filesInLib != null) {
       for (final File file : filesInLib) {
         if (file.isFile()) {
@@ -73,19 +76,14 @@ public class JettyApplicationServerHelper implements ApplicationServerHelper
     }
 
     final File jspApi21File =
-        new File(new File(jettyLib, JettyConstants.JETTY_JSP_2_1_LIB_DIRECTORY_NAME), JSP_API_2_1_JAR);
+      new File(new File(jettyLib, JettyConstants.JETTY_JSP_2_1_LIB_DIRECTORY_NAME), JSP_API_2_1_JAR);
     if (jspApi21File.isFile()) {
       files.add(jspApi21File);
     }
 
-    String version = jettyPersistentData.getJettyVersion();
-    if (version == null) {
-      version = "";
-    }
-//    else {
-//      version = version.substring(0, 1);
-//    }
+    final String version = jettyPersistentData.getJettyVersion();
+
     return new ApplicationServerInfo(files.toArray(new File[files.size()]),
-        JettyBundle.message("default.application.server.name", version));
+      JettyBundle.message("default.application.server.name", version));
   }
 }
