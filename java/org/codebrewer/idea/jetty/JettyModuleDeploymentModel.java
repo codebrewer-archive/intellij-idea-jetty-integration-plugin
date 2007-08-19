@@ -18,6 +18,10 @@ package org.codebrewer.idea.jetty;
 import com.intellij.javaee.JavaeeModuleProperties;
 import com.intellij.javaee.deployment.DeploymentModel;
 import com.intellij.javaee.run.configuration.CommonModel;
+import com.intellij.openapi.util.InvalidDataException;
+import com.intellij.openapi.util.WriteExternalException;
+import org.jdom.Element;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Mark Scott
@@ -25,19 +29,53 @@ import com.intellij.javaee.run.configuration.CommonModel;
  */
 public class JettyModuleDeploymentModel extends DeploymentModel
 {
-  private String contextPath = "/";
+  private static final String CONTEXT_PATH_NAME = "CONTEXT_PATH";
+  private static final String DEFAULT_CONTEXT_PATH = "/";
 
-  public JettyModuleDeploymentModel(CommonModel project, JavaeeModuleProperties moduleProperties) {
+  private String contextPath = DEFAULT_CONTEXT_PATH;
+
+  public JettyModuleDeploymentModel(CommonModel project, JavaeeModuleProperties moduleProperties)
+  {
     super(project, moduleProperties);
   }
 
+  @NotNull
   public String getContextPath()
   {
     return contextPath;
   }
 
-  public void setContextPath(String contextPath)
+  public void setContextPath(@NotNull String contextPath)
   {
     this.contextPath = contextPath;
+  }
+
+  @Override
+  public void readExternal(Element element) throws InvalidDataException
+  {
+    super.readExternal(element);
+
+    for (Object o : element.getChildren("option")) {
+      final Element e = (Element) o;
+      final String fieldName = e.getAttributeValue("name");
+
+      if (CONTEXT_PATH_NAME.equals(fieldName)) {
+        final String value = e.getAttributeValue("value");
+
+        setContextPath(value == null ? DEFAULT_CONTEXT_PATH : value);
+      }
+    }
+  }
+
+  @Override
+  public void writeExternal(Element element) throws WriteExternalException
+  {
+    final Element contextPathElement = new Element("option");
+
+    element.addContent(contextPathElement);
+    contextPathElement.setAttribute("name", CONTEXT_PATH_NAME);
+    contextPathElement.setAttribute("value", getContextPath());
+
+    super.writeExternal(element);
   }
 }

@@ -55,8 +55,10 @@ public class JettyModel implements ServerModel
   private CommonModel commonModel;
   private String stopKey;
   private int stopPort;
+  private File scratchDirectory;
 
-  public @NotNull File[] getActiveConfigFiles() throws RuntimeConfigurationError
+  @NotNull
+  public File[] getActiveConfigFiles() throws RuntimeConfigurationError
   {
     final ApplicationServer applicationServer = commonModel.getApplicationServer();
 
@@ -66,9 +68,9 @@ public class JettyModel implements ServerModel
 
     final JettyPersistentData jettyPersistentData = ((JettyPersistentData) applicationServer.getPersistentData());
     final List<JettyPersistentData.JettyConfigurationFile> configFiles =
-        jettyPersistentData.getJettyConfigurationFiles();
+      jettyPersistentData.getJettyConfigurationFiles();
     final List<JettyPersistentData.JettyConfigurationFile> activeConfigFiles =
-        new ArrayList<JettyPersistentData.JettyConfigurationFile>();
+      new ArrayList<JettyPersistentData.JettyConfigurationFile>();
 
     for (final JettyPersistentData.JettyConfigurationFile configFile : configFiles) {
       if (configFile.isActive()) {
@@ -85,7 +87,8 @@ public class JettyModel implements ServerModel
     return result;
   }
 
-  public @NotNull String[] getActiveConfigFilePaths() throws RuntimeConfigurationError
+  @NotNull
+  public String[] getActiveConfigFilePaths() throws RuntimeConfigurationError
   {
     final File[] activeConfigFiles = getActiveConfigFiles();
     final String[] result = new String[activeConfigFiles.length];
@@ -115,6 +118,11 @@ public class JettyModel implements ServerModel
     return commonModel.getProject();
   }
 
+  public File getScratchDirectory()
+  {
+    return scratchDirectory;
+  }
+
   public String getStopKey()
   {
     return stopKey;
@@ -128,6 +136,11 @@ public class JettyModel implements ServerModel
   public boolean isLocal()
   {
     return commonModel.isLocal();
+  }
+
+  public void setScratchDirectory(File scratchDirectory)
+  {
+    this.scratchDirectory = scratchDirectory;
   }
 
   public void setStopKey(final String stopKey)
@@ -155,7 +168,12 @@ public class JettyModel implements ServerModel
     final JettyServerInstance jettyServerInstance = new JettyServerInstance(commonModel);
 
     if (commonModel.isLocal()) {
-      JettyDeploymentProvider.prepareServer(this);
+      try {
+        JettyDeploymentProvider.prepareServer(this);
+      }
+      catch (JettyException e) {
+        throw new ExecutionException(e.getMessage(), e);
+      }
     }
 
     return jettyServerInstance;
@@ -171,8 +189,7 @@ public class JettyModel implements ServerModel
   {
     // Todo - add context?
 
-    final StringBuilder result = new StringBuilder();
-    result.append(JettyConstants.HTTP_SCHEME);
+    final StringBuilder result = new StringBuilder(JettyConstants.HTTP_SCHEME);
     result.append(commonModel.getHost());
     result.append(':');
     result.append(String.valueOf(commonModel.getPort()));
@@ -189,7 +206,7 @@ public class JettyModel implements ServerModel
   }
 
   public OutputProcessor createOutputProcessor(
-      final ProcessHandler j2EEOSProcessHandlerWrapper, final J2EEServerInstance serverInstance)
+    final ProcessHandler j2EEOSProcessHandlerWrapper, final J2EEServerInstance serverInstance)
   {
     return new DefaultOutputProcessor(j2EEOSProcessHandlerWrapper);
   }
@@ -210,6 +227,9 @@ public class JettyModel implements ServerModel
   public void checkConfiguration() throws RuntimeConfigurationException
   {
     final Set<String> contexts = new HashSet<String>();
+
+    // Todo - add those contexts already 'claimed' by active Jetty configuration files
+
     final Module[] modules = commonModel.getModules();
 
     for (final Module module : modules) {
@@ -217,11 +237,19 @@ public class JettyModel implements ServerModel
 
       if (properties != null) {
         final JettyModuleDeploymentModel model =
-            (JettyModuleDeploymentModel) commonModel.getDeploymentModel(properties);
+          (JettyModuleDeploymentModel) commonModel.getDeploymentModel(properties);
 
-        if (model.DEPLOY && !contexts.add(model.getContextPath())) {
-          throw new RuntimeConfigurationError(
-              JettyBundle.message("error.text.duplicated.context.path", model.getContextPath()));
+        if (model.DEPLOY) {
+          final String contextPath = model.getContextPath();
+
+          if (!contexts.add(contextPath)) {
+            throw new RuntimeConfigurationError(
+              JettyBundle.message("error.text.duplicated.context.path", contextPath));
+          }
+
+          if (!contextPath.startsWith("/")) {
+            throw new RuntimeConfigurationError(JettyBundle.message("error.text.missing.leading.slash", contextPath));
+          }
         }
       }
     }
@@ -232,11 +260,13 @@ public class JettyModel implements ServerModel
     return JettyConstants.DEFAULT_PORT;
   }
 
+  @SuppressWarnings({ "ParameterNameDiffersFromOverriddenParameter" })
   public void setCommonModel(final CommonModel commonModel)
   {
     this.commonModel = commonModel;
   }
 
+  @Override
   public JettyModel clone() throws CloneNotSupportedException
   {
     return (JettyModel) super.clone();
@@ -247,7 +277,7 @@ public class JettyModel implements ServerModel
     try {
       return JettyUtil.getPort(getActiveConfigFiles());
     }
-    catch (RuntimeConfigurationException e) {
+    catch (RuntimeConfigurationException ignore) {
       return getDefaultPort();
     }
   }

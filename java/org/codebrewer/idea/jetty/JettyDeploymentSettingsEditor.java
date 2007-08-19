@@ -23,41 +23,77 @@ import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.util.Factory;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import java.awt.BorderLayout;
 
 /**
- * Editor to configure Jetty for run and debug sessions.  Not currently used.
+ * Editor to configure Jetty for run and debug sessions.
  *
  * @author Mark Scott
  * @version $Id$
  */
 public class JettyDeploymentSettingsEditor extends SettingsEditor<DeploymentModel>
 {
+  private JPanel panel;
+  private JTextField contextPath;
+
   public JettyDeploymentSettingsEditor(final CommonModel configuration, final JavaeeModuleProperties moduleProperties)
   {
-    super(new Factory<DeploymentModel>() {
-      public JettyModuleDeploymentModel create() {
+    super(new Factory<DeploymentModel>()
+    {
+      public JettyModuleDeploymentModel create()
+      {
         return new JettyModuleDeploymentModel(configuration, moduleProperties);
       }
     });
+
+    build();
   }
 
-  protected void resetEditorFrom(final DeploymentModel s)
+  private void build()
   {
-  }
-
-  protected void applyEditorTo(final DeploymentModel s) throws ConfigurationException
-  {
+    panel = new JPanel(new BorderLayout());
+    panel.setBorder(BorderFactory.createTitledBorder(JettyBundle.message("label.deployment.context.path")));
+    contextPath = new JTextField();
+    panel.add(contextPath, BorderLayout.NORTH);
   }
 
   @NotNull
-  protected JComponent createEditor()
+  private String getSelectedContextPath()
   {
-//    return new JLabel("JettyDeploymentSettingsEditor");
-    return new JLabel();
+    final String item = contextPath.getText();
+
+    return (item == null) ? "" : item;
   }
 
+  private void setSelectedContextPath(@NotNull final String contextPath)
+  {
+    this.contextPath.setText(contextPath);
+  }
+
+  @Override
+  protected void resetEditorFrom(final DeploymentModel s)
+  {
+    setSelectedContextPath(((JettyModuleDeploymentModel) s).getContextPath());
+  }
+
+  @Override
+  protected void applyEditorTo(final DeploymentModel s) throws ConfigurationException
+  {
+    ((JettyModuleDeploymentModel) s).setContextPath(getSelectedContextPath());
+  }
+
+  @NotNull
+  @Override
+  protected JComponent createEditor()
+  {
+    return panel;
+  }
+
+  @Override
   protected void disposeEditor()
   {
   }
