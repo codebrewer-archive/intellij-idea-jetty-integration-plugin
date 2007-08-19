@@ -139,6 +139,7 @@
 
   <target name="make_source_zip">
     <mkdir dir="${build}/src" />
+    <mkdir dir="${dist}/src" />
     <property file="${src}/org/codebrewer/idea/jetty/build/build.properties" />
     <echo file="${build}/src/README">README for ${project} plug-in sources
 
@@ -152,7 +153,7 @@
       IDEA plug-in development sandbox (useful if you want to hack on the plug-in).
     </echo>
     <zip
-        destfile="${staging}/${project.name.compressed}-${build.version.major}.${build.version.minor}.${build.version.revision}.${build.number}-src.zip"
+        destfile="${dist}/src/${project.name.compressed}-${build.version.major}.${build.version.minor}.${build.version.revision}.${build.number}-src.zip"
         encoding="UTF8">
       <zipfileset dir="${bin}" prefix="bin" />
       <zipfileset dir="${images}" prefix="images" includes="*png, *xcf" />
