@@ -2,11 +2,15 @@
 <idea-plugin version="2">
   <name>Jetty Integration</name>
   <id>Jetty Integration</id>
-  <description>Allows configuration and use of the Jetty webserver directly from IntelliJ IDEA, for running/debugging web applications.  Hot un/re/deployment is not yet implemented.</description>
+  <description>Allows configuration and use of the Jetty webserver directly from IntelliJ IDEA, for running/debugging web applications.  JSP debugging is not yet implemented.</description>
   <version>##PLUGIN_VERSION##</version>
   <vendor email="mark@codebrewer.org" logo="/images/jetty16x16.png">Codebrewer</vendor>
   <change-notes>
-    <![CDATA[<b>Version 0.2.0 (Build 18)</b>
+    <![CDATA[<b>Version 0.3.0 (Build 42)</b>
+<ul>
+<li>New: Support hot deployment of web contexts.</li>
+</ul>
+<b>Version 0.2.0 (Build 18)</b>
 <ul>
 <li>New: Permit Jetty's configuration files to be specified.</li>
 <li>Fixed: plugins.intellij.net makes bundling source code with a binary distribution unnecessary.</li>
