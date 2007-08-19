@@ -29,10 +29,12 @@ import com.intellij.openapi.projectRoots.ProjectJdk;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.util.EnvironmentUtil;
+import static org.codebrewer.idea.jetty.JettyConstants.JETTY_CONTEXT_DEPLOYER_CONFIG_FILE_NAME;
 import org.jetbrains.annotations.NonNls;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,17 +45,15 @@ import java.util.List;
 public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
 {
   @NonNls
-  private static final String START_JAR_NAME = "start.jar";
-  @NonNls
   private static final String BIN_DIR = "bin";
-  @NonNls
-  private static final String ETC_DIR = "etc";
   @NonNls
   private static final String JAVA_HOME_ENV_PROPERTY = "JAVA_HOME";
   @NonNls
   private static final String JAVA_VM_ENV_VARIABLE = "JAVA_OPTS";
   @NonNls
-  private static final String JAR_PARAMETER = "-jar";
+  private static final String JETTY_STOP_COMMAND_TEMPLATE = "-DSTOP.PORT={0,number,#####} -DSTOP.KEY={1} -jar start.jar --stop";
+  @NonNls
+  private static final String JETTY_START_COMMAND = "-DSTOP.PORT=0 -jar start.jar";
 
   @NonNls
   private static String getDefaultJettyLauncherFileName()
@@ -61,19 +61,36 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
     return SystemInfo.isWindows ? "jetty.bat" : "jetty.sh";
   }
 
-  private static File getEtcDirectory(final JettyModel jettyModel) throws RuntimeConfigurationException
-  {
-    return new File(new File(jettyModel.getHomeDirectory()), ETC_DIR);
-  }
-
   private static File getJettyLauncherFile()
   {
     final String binDir =
-//        PathManager.getResourceRoot(JettyStartupPolicy.class, "/") + File.separator + ".." + File.separator + BIN_DIR;
-//    binDir.replaceAll("classes" + File.separator + ".." + File.separator, "");
-      PathManager.getPluginsPath() + File.separator + JettyManager.PLUGIN_NAME + File.separator + BIN_DIR; // Todo - fix 'Integration'
-
+      PathManager.getPluginsPath() + File.separator + JettyManager.PLUGIN_NAME + File.separator + BIN_DIR;
     return new File(binDir, getDefaultJettyLauncherFileName());
+  }
+
+  public static void ensureExecutable()
+  {
+    if (!SystemInfo.isWindows) {
+      final Logger logger = Logger.getInstance(JettyManager.class.getName());
+      final File jettyLauncherFile = getJettyLauncherFile();
+      final ProcessBuilder processBuilder = new ProcessBuilder("/bin/chmod", "+x", jettyLauncherFile.getAbsolutePath());
+      final String errorMessage = "Couldn't set executable bit on " + jettyLauncherFile.getAbsolutePath();
+
+      try {
+        final Process process = processBuilder.start();
+        final int exitValue = process.waitFor();
+
+        if (exitValue != 0) {
+          logger.warn(errorMessage);
+        }
+      }
+      catch (IOException e) {
+        logger.error(errorMessage, e);
+      }
+      catch (InterruptedException e) {
+        logger.error(errorMessage, e);
+      }
+    }
   }
 
   public ScriptsHelper getStartupHelper()
@@ -82,15 +99,8 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
     {
       public ExecutableObject getDefaultScript(final CommonModel model)
       {
-//        try {
         final File jettyLauncherFile = getJettyLauncherFile();
-//          final JettyModel jettyModel = ((JettyModel) model.getServerModel());
-//          return createJettyExecutable(model, jettyModel, null);
         return new CommandLineExecutableObject(new String[]{ jettyLauncherFile.getAbsolutePath() }, null);
-//        }
-//        catch (RuntimeConfigurationException e) {
-//          return null;
-//        }
       }
     };
   }
@@ -134,19 +144,24 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
           final JettyModel jettyModel = (JettyModel) model.getServerModel();
           vars.add(new EnvironmentVariable(JettyConstants.JETTY_HOME_ENV_VAR, jettyModel.getHomeDirectory(), true));
           final int stopPort = jettyModel.getStopPort();
+
           if (stopPort == 0) {
             final String[] configFilePaths = jettyModel.getActiveConfigFilePaths();
-            final StringBuilder sb = new StringBuilder("-DSTOP.PORT=0 -jar start.jar");
+            final File scratchDirectory = jettyModel.getScratchDirectory();
+            final StringBuilder sb = new StringBuilder(JETTY_START_COMMAND);
 
             for (final String configFilePath : configFilePaths) {
               sb.append(' ').append(configFilePath);
             }
 
+            sb.append(' ').append(new File(scratchDirectory, JETTY_CONTEXT_DEPLOYER_CONFIG_FILE_NAME));
             vars.add(new EnvironmentVariable(JettyConstants.JETTY_OPTS_ENV_VAR, sb.toString(), true));
           }
           else {
             final String stopKey = jettyModel.getStopKey();
-            vars.add(new EnvironmentVariable(JettyConstants.JETTY_OPTS_ENV_VAR, "-DSTOP.PORT=" + stopPort + " -DSTOP.KEY=" + stopKey + " -jar start.jar --stop", true));
+            final String jettyOptsEnvVar = MessageFormat.format(JETTY_STOP_COMMAND_TEMPLATE, stopPort, stopKey);
+
+            vars.add(new EnvironmentVariable(JettyConstants.JETTY_OPTS_ENV_VAR, jettyOptsEnvVar, true));
             jettyModel.setStopPort(0);
           }
         }
@@ -165,30 +180,5 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
     };
 
     return helper;
-  }
-
-  public static void ensureExecutable()
-  {
-    if (!SystemInfo.isWindows) {
-      final Logger logger = Logger.getInstance(JettyManager.class.getName());
-      final File jettyLauncherFile = getJettyLauncherFile();
-      final ProcessBuilder processBuilder = new ProcessBuilder("/bin/chmod", "+x", jettyLauncherFile.getAbsolutePath());
-      final String errorMessage = "Couldn't set executable bit on " + jettyLauncherFile.getAbsolutePath();
-
-      try {
-        final Process process = processBuilder.start();
-        final int exitValue = process.waitFor();
-
-        if (exitValue != 0) {
-          logger.warn(errorMessage);
-        }
-      }
-      catch (IOException e) {
-        logger.error(errorMessage, e);
-      }
-      catch (InterruptedException e) {
-        logger.error(errorMessage, e);
-      }
-    }
   }
 }

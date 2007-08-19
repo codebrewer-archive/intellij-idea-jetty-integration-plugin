@@ -56,6 +56,7 @@ public class JettyModel implements ServerModel
   private CommonModel commonModel;
   private String stopKey;
   private int stopPort;
+  private File scratchDirectory;
 
   @NotNull
   public File[] getActiveConfigFiles() throws RuntimeConfigurationError
@@ -118,6 +119,11 @@ public class JettyModel implements ServerModel
     return commonModel.getProject();
   }
 
+  public File getScratchDirectory()
+  {
+    return scratchDirectory;
+  }
+
   public String getStopKey()
   {
     return stopKey;
@@ -131,6 +137,11 @@ public class JettyModel implements ServerModel
   public boolean isLocal()
   {
     return commonModel.isLocal();
+  }
+
+  public void setScratchDirectory(File scratchDirectory)
+  {
+    this.scratchDirectory = scratchDirectory;
   }
 
   public void setStopKey(final String stopKey)
@@ -158,7 +169,12 @@ public class JettyModel implements ServerModel
     final JettyServerInstance jettyServerInstance = new JettyServerInstance(commonModel);
 
     if (commonModel.isLocal()) {
-      JettyDeploymentProvider.prepareServer(this);
+      try {
+        JettyDeploymentProvider.prepareServer(this);
+      }
+      catch (JettyException e) {
+        throw new ExecutionException(e.getMessage(), e);
+      }
     }
 
     return jettyServerInstance;
@@ -174,8 +190,7 @@ public class JettyModel implements ServerModel
   {
     // Todo - add context?
 
-    final StringBuilder result = new StringBuilder(128);
-    result.append(JettyConstants.HTTP_SCHEME);
+    final StringBuilder result = new StringBuilder(JettyConstants.HTTP_SCHEME);
     result.append(commonModel.getHost());
     result.append(':');
     result.append(String.valueOf(commonModel.getPort()));
@@ -213,15 +228,26 @@ public class JettyModel implements ServerModel
   public void checkConfiguration() throws RuntimeConfigurationException
   {
     final Set<String> contexts = new HashSet<String>();
+
+    // Todo - add those contexts already 'claimed' by active Jetty configuration files
+
     final Module[] modules = commonModel.getModules();
 
     for (final WebFacet webFacet : JavaeeFacetUtil.getInstance().getJavaeeFacets(WebFacet.ID, modules)) {
       final JettyModuleDeploymentModel model =
         (JettyModuleDeploymentModel) commonModel.getDeploymentModel(webFacet);
 
-      if (model.DEPLOY && !contexts.add(model.getContextPath())) {
-        throw new RuntimeConfigurationError(
-          JettyBundle.message("error.text.duplicated.context.path", model.getContextPath()));
+      if (model.DEPLOY) {
+        final String contextPath = model.getContextPath();
+
+        if (!contexts.add(contextPath)) {
+          throw new RuntimeConfigurationError(
+            JettyBundle.message("error.text.duplicated.context.path", contextPath));
+        }
+
+        if (!contextPath.startsWith("/")) {
+          throw new RuntimeConfigurationError(JettyBundle.message("error.text.missing.leading.slash", contextPath));
+        }
       }
     }
   }

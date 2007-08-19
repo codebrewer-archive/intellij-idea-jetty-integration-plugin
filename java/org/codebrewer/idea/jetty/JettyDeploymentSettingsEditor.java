@@ -24,17 +24,23 @@ import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.util.Factory;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import java.awt.BorderLayout;
 
 /**
- * Editor to configure Jetty for run and debug sessions.  Not currently used.
+ * Editor to configure Jetty for run and debug sessions.
  *
  * @author Mark Scott
  * @version $Id$
  */
 public class JettyDeploymentSettingsEditor extends SettingsEditor<DeploymentModel>
 {
+  private JPanel panel;
+  private JTextField contextPath;
+
   public JettyDeploymentSettingsEditor(final CommonModel configuration, final JavaeeFacet facet)
   {
     super(new Factory<DeploymentModel>()
@@ -45,24 +51,48 @@ public class JettyDeploymentSettingsEditor extends SettingsEditor<DeploymentMode
         return new JettyModuleDeploymentModel(configuration, manager.create(facet));
       }
     });
+
+    build();
+  }
+
+  private void build()
+  {
+    panel = new JPanel(new BorderLayout());
+    panel.setBorder(BorderFactory.createTitledBorder(JettyBundle.message("label.deployment.context.path")));
+    contextPath = new JTextField();
+    panel.add(contextPath, BorderLayout.NORTH);
+  }
+
+  @NotNull
+  private String getSelectedContextPath()
+  {
+    final String item = contextPath.getText();
+
+    return (item == null) ? "" : item;
+  }
+
+  private void setSelectedContextPath(@NotNull final String contextPath)
+  {
+    this.contextPath.setText(contextPath);
   }
 
   @Override
   protected void resetEditorFrom(final DeploymentModel s)
   {
+    setSelectedContextPath(((JettyModuleDeploymentModel) s).getContextPath());
   }
 
   @Override
   protected void applyEditorTo(final DeploymentModel s) throws ConfigurationException
   {
+    ((JettyModuleDeploymentModel) s).setContextPath(getSelectedContextPath());
   }
 
   @NotNull
   @Override
   protected JComponent createEditor()
   {
-//    return new JLabel("JettyDeploymentSettingsEditor");
-    return new JLabel();
+    return panel;
   }
 
   @Override
