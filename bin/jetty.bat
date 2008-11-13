@@ -1,7 +1,7 @@
 @echo off
 
 ::
-:: Copyright 2007 Mark Scott
+:: Copyright 2007, 2008 Mark Scott
 ::
 :: Licensed under the Apache License, Version 2.0 (the "License");
 :: you may not use this file except in compliance with the License.
@@ -24,23 +24,23 @@
 
 setlocal
 
-if exist %JAVA_HOME%\bin\java.exe goto JavaFound
+if exist "%JAVA_HOME%\bin\java.exe" goto JavaFound
 echo "JAVA_HOME does not point at a JDK or JRE.  Either set the JAVA_HOME environment variable or specify a JDK for your IDEA project."
 exit 1
 
 :JavaFound
-if exist %JETTY_HOME%\start.jar goto StartJarFound
+if exist "%JETTY_HOME%\start.jar" goto StartJarFound
 echo "JETTY_HOME\start.jar was not found.  Check your Jetty installation."
 exit 1
 
 :StartJarFound
-if "%JETTY_OPTS%" == "" set JETTY_OPTS=-jar start.jar
+if "%JETTY_OPTS%" == "" set JETTY_OPTS=-cp start.jar org.mortbay.start.Main
 if not "%JAVA_OPTS%" == "" set JETTY_OPTS=%JAVA_OPTS% %JETTY_OPTS%
 
 set PWD=%CD%
 cd /d "%JETTY_HOME%"
 
-%JAVA_HOME%\bin\java.exe %JETTY_OPTS%
+"%JAVA_HOME%\bin\java.exe" %JETTY_OPTS% %*
 
 cd /d "%PWD%"
 
