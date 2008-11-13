@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Mark Scott
+ * Copyright 2007, 2008 Mark Scott
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,6 +105,12 @@ public class JettyConstants
    */
   @NonNls
   public static final String JETTY_CONTEXT_DEPLOYER_CONFIG_DIR_NAME = "contexts";
+
+  /**
+   * The name of the 'main' Jetty configuration file.
+   */
+  @NonNls
+  public static final String JETTY_XML_FILE_NAME = "jetty.xml";
 
   private JettyConstants()
   {
