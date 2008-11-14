@@ -7,7 +7,14 @@
   <depends>com.intellij.javaee</depends>
   <vendor email="mark@codebrewer.org" logo="/images/jetty16x16.png">Codebrewer</vendor>
   <change-notes>
-    <![CDATA[<b>Version 0.3.0 (Build 39)</b>
+    <![CDATA[<b>Version 0.3.1 (Build 48)</b>
+<ul>
+<li>Fixed: Launch scripts fail when Java executable path and Jetty configuration file paths contain spaces.</li>
+<li>Fixed: Default order of configuration files when creating an application server configuration causes IllegalStateException.</li>
+<li>Fixed: Jetty version number may not be detected correctly when creating an application server configuration.</li>
+<li>Fixed: Launch process sometimes fails to determine stop port and key, preventing IDEA from stopping Jetty.</li>
+</ul>
+<b>Version 0.3.0 (Build 39)</b>
 <ul>
 <li>New: Support IDEA 7.x facets.</li>
 <li>New: Support hot deployment of web contexts.</li>
