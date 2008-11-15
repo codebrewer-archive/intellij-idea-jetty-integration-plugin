@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Mark Scott
+ * Copyright 2007, 2008 Mark Scott
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import com.intellij.javaee.appServerIntegrations.ApplicationServerHelper;
 import com.intellij.javaee.deployment.DeploymentProvider;
 import com.intellij.javaee.facet.JavaeeFacet;
 import com.intellij.javaee.facet.JavaeeFacetUtil;
+import com.intellij.javaee.openapi.ex.AppServerIntegrationsManager;
 import com.intellij.javaee.web.facet.WebFacet;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.util.IconLoader;
 import org.jetbrains.annotations.NonNls;
@@ -55,7 +55,7 @@ public class JettyManager extends AppServerIntegration
 
   public static JettyManager getInstance()
   {
-    return ApplicationManager.getApplication().getComponent(JettyManager.class);
+    return AppServerIntegrationsManager.getInstance().getIntegration(JettyManager.class);
   }
 
   private ApplicationServerHelper applicationServerHelper = new JettyApplicationServerHelper();
@@ -101,19 +101,10 @@ public class JettyManager extends AppServerIntegration
     return JavaeeFacetUtil.getInstance().getSingletonCollection(WebFacet.ID);
   }
 
-  public void disposeComponent()
-  {
-  }
-
   @NonNls
   @NotNull
   public String getComponentName()
   {
     return getClass().getName();
-  }
-
-  public void initComponent()
-  {
-    JettyStartupPolicy.ensureExecutable();
   }
 }

@@ -38,15 +38,8 @@
   </change-notes>
   <idea-version since-build="##IDEA_VERSION_MIN##" until-build="##IDEA_VERSION_MAX##" />
   <resource-bundle>org.codebrewer.idea.jetty.JettyBundle</resource-bundle>
-  <!--<extensions defaultExtensionNs="com.intellij" xmlns="com.intellij">-->
-    <!--<errorHandler implementation="com.intellij.diagnostic.ITNReporter"/>-->
-  <!--</extensions>-->
-  <application-components>
-    <component>
-      <implementation-class>org.codebrewer.idea.jetty.JettyManager</implementation-class>
-    </component>
-    <component>
-      <implementation-class>org.codebrewer.idea.jetty.JettyRunConfigurationType</implementation-class>
-    </component>
-  </application-components>
+  <extensions defaultExtensionNs="com.intellij">
+    <configurationType implementation="org.codebrewer.idea.jetty.JettyRunConfigurationType" />
+    <javaee.appServerIntegration implementation="org.codebrewer.idea.jetty.JettyManager" />
+  </extensions>
 </idea-plugin>

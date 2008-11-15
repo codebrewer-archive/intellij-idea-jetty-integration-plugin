@@ -17,16 +17,18 @@ package org.codebrewer.idea.jetty;
 
 import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.execution.configurations.RuntimeConfigurationException;
+import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.execution.util.EnvironmentVariable;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.javaee.run.localRun.CommandLineExecutableObject;
 import com.intellij.javaee.run.localRun.EnvironmentHelper;
 import com.intellij.javaee.run.localRun.ExecutableObject;
 import com.intellij.javaee.run.localRun.ExecutableObjectStartupPolicy;
+import com.intellij.javaee.run.localRun.ScriptHelper;
 import com.intellij.javaee.run.localRun.ScriptsHelper;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.projectRoots.ProjectJdk;
+import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.util.EnvironmentUtil;
@@ -107,9 +109,23 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
     }
   }
 
+  static {
+    ensureExecutable();
+  }
+
   public ScriptsHelper getStartupHelper()
   {
-    return new ScriptsHelper()
+    return null;
+  }
+
+  public ScriptsHelper getShutdownHelper()
+  {
+    return null;
+  }
+
+  public ScriptHelper createStartupScriptHelper(final ProgramRunner runner)
+  {
+    return new ScriptHelper()
     {
       public ExecutableObject getDefaultScript(final CommonModel model)
       {
@@ -148,9 +164,9 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
     };
   }
 
-  public ScriptsHelper getShutdownHelper()
+  public ScriptHelper createShutdownScriptHelper(final ProgramRunner runner)
   {
-    return new ScriptsHelper()
+    return new ScriptHelper()
     {
       public ExecutableObject getDefaultScript(final CommonModel model)
       {
@@ -170,7 +186,7 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
         final List<EnvironmentVariable> vars = new ArrayList<EnvironmentVariable>();
 
         try {
-          final ProjectJdk projectJdk = ProjectRootManager.getInstance(model.getProject()).getProjectJdk();
+          final Sdk projectJdk = ProjectRootManager.getInstance(model.getProject()).getProjectJdk();
 
           if (projectJdk != null) {
             vars.add(new EnvironmentVariable(
