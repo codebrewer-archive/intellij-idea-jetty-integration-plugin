@@ -7,8 +7,9 @@
   <depends>com.intellij.javaee</depends>
   <vendor email="mark@codebrewer.org" logo="/images/jetty16x16.png">Codebrewer</vendor>
   <change-notes>
-    <![CDATA[<b>Version 0.3.1 (Build 48)</b>
+    <![CDATA[<b>Version 0.3.1 (Build 51)</b>
 <ul>
+<li>New: Updated for IDEA 8.x.</li>
 <li>Fixed: Launch scripts fail when Java executable path and Jetty configuration file paths contain spaces.</li>
 <li>Fixed: Default order of configuration files when creating an application server configuration causes IllegalStateException.</li>
 <li>Fixed: Jetty version number may not be detected correctly when creating an application server configuration.</li>
