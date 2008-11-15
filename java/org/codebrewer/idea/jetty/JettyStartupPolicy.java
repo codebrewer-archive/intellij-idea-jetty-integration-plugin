@@ -131,35 +131,27 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
       {
         final File jettyLauncherFile = getJettyLauncherFile();
         final JettyModel jettyModel = (JettyModel) model.getServerModel();
-        final int stopPort = jettyModel.getStopPort();
+        String arguments = null;
 
-        // If the stop port is zero then the call is for the startup script and
-        // we must gather the Jetty config files and pass them as process
-        // arguments
-        //
-        if (stopPort == 0) {
-          try {
-            final String[] configFilePaths = jettyModel.getActiveConfigFilePaths();
-            final File scratchDirectory = jettyModel.getScratchDirectory();
-            final StringBuilder arguments = new StringBuilder();
+        try {
+          final String[] configFilePaths = jettyModel.getActiveConfigFilePaths();
+          final File scratchDirectory = jettyModel.getScratchDirectory();
+          final StringBuilder argumentList = new StringBuilder();
 
-            for (final String configFilePath : configFilePaths) {
-              arguments.append(' ').append(quoteIfNecessary(configFilePath));
-            }
-
-            arguments.append(' ').append(quoteIfNecessary(new File(scratchDirectory, JETTY_CONTEXT_DEPLOYER_CONFIG_FILE_NAME).getPath()));
-
-            return new CommandLineExecutableObject(new String[]{ jettyLauncherFile.getAbsolutePath() }, arguments.toString());
+          for (final String configFilePath : configFilePaths) {
+            argumentList.append(' ').append(quoteIfNecessary(configFilePath));
           }
-          catch (RuntimeConfigurationError runtimeConfigurationError) {
-            runtimeConfigurationError.printStackTrace();
-          }
+
+          argumentList.append(' ').append(quoteIfNecessary(new File(scratchDirectory, JETTY_CONTEXT_DEPLOYER_CONFIG_FILE_NAME).getPath()));
+          arguments = argumentList.toString();
+        }
+        catch (RuntimeConfigurationError runtimeConfigurationError) {
+          // Ignore - probably means we're being called when a new run/debug
+          // configuration is being created i.e. before the user has been able
+          // to choose an application server configuration
         }
 
-        // Otherwise the call is for the shutdown script (which doesn't need any
-        // arguments
-        //
-        return new CommandLineExecutableObject(new String[]{ jettyLauncherFile.getAbsolutePath() }, null);
+        return new CommandLineExecutableObject(new String[]{ jettyLauncherFile.getAbsolutePath() }, arguments);
       }
     };
   }
