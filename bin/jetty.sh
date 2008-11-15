@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #
-# Copyright 2007 Mark Scott
+# Copyright 2007, 2008 Mark Scott
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,27 +24,27 @@ set -e
 
 #/usr/bin/env | /usr/bin/sort >/tmp/jetty-env
 
-if [ ! -x ${JAVA_HOME}/bin/java ]; then
+if [ ! -x "${JAVA_HOME}/bin/java" ]; then
   echo "JAVA_HOME does not point at a JDK or JRE.  Either set the JAVA_HOME environment variable or specify a JDK for your IDEA project."
   exit 1
 fi
 
-if [ ! -f ${JETTY_HOME}/start.jar ]; then
+if [ ! -f "${JETTY_HOME}/start.jar" ]; then
   echo "JETTY_HOME/start.jar was not found.  Check your Jetty installation."
   exit 1
 fi
 
 if [ -z "${JETTY_OPTS}" ]; then
-  JETTY_OPTS="-jar start.jar"
+  JETTY_OPTS="-cp start.jar org.mortbay.start.Main"
 fi
 
 if [ ! -z "${JAVA_OPTS}" ]; then
   JETTY_OPTS="${JAVA_OPTS} ${JETTY_OPTS}"
 fi
 
-cd ${JETTY_HOME} || exit 1
+cd "${JETTY_HOME}" || exit 1
 
-${JAVA_HOME}/bin/java ${JETTY_OPTS}
+"${JAVA_HOME}/bin/java" ${JETTY_OPTS} "${@}"
 
 cd - >/dev/null
 

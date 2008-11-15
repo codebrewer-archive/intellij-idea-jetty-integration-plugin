@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Mark Scott
+ * Copyright 2007, 2008 Mark Scott
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 public class Jetty6xVersionFileChecker extends AbstractJettyVersionFileChecker
 {
   @NonNls private static final String VERSION_FILE_NAME = "VERSION.txt";
-  @NonNls private static final String VERSION_PATTERN = "^jetty-(.*) - .*";
+  @NonNls private static final String VERSION_PATTERN = "^jetty-(6\\.1\\.\\d+) .*";
 
   @NotNull public String getVersionFileName()
   {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Mark Scott
+ * Copyright 2007, 2008 Mark Scott
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,26 @@
  */
 package org.codebrewer.idea.jetty;
 
+import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.execution.configurations.RuntimeConfigurationException;
+import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.execution.util.EnvironmentVariable;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.javaee.run.localRun.CommandLineExecutableObject;
 import com.intellij.javaee.run.localRun.EnvironmentHelper;
 import com.intellij.javaee.run.localRun.ExecutableObject;
 import com.intellij.javaee.run.localRun.ExecutableObjectStartupPolicy;
+import com.intellij.javaee.run.localRun.ScriptHelper;
 import com.intellij.javaee.run.localRun.ScriptsHelper;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.projectRoots.ProjectJdk;
+import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.util.EnvironmentUtil;
 import static org.codebrewer.idea.jetty.JettyConstants.JETTY_CONTEXT_DEPLOYER_CONFIG_FILE_NAME;
 import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,7 +57,11 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
   @NonNls
   private static final String JETTY_STOP_COMMAND_TEMPLATE = "-DSTOP.PORT={0,number,#####} -DSTOP.KEY={1} -jar start.jar --stop";
   @NonNls
-  private static final String JETTY_START_COMMAND = "-DSTOP.PORT=0 -jar start.jar";
+  private static final String JETTY_START_COMMAND = "-DSTOP.PORT=0 -cp start.jar org.mortbay.start.Main";
+  @NonNls
+  private static final String DOUBLE_QUOTE_STRING = "\"";
+  @NonNls
+  private static final String SPACE_STRING = " ";
 
   @NonNls
   private static String getDefaultJettyLauncherFileName()
@@ -66,6 +74,14 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
     final String binDir =
       PathManager.getPluginsPath() + File.separator + JettyManager.PLUGIN_NAME + File.separator + BIN_DIR;
     return new File(binDir, getDefaultJettyLauncherFileName());
+  }
+
+  @NonNls
+  @NotNull
+  private static String quoteIfNecessary(@NotNull final String s)
+  {
+    return s.contains(SPACE_STRING) ?
+      new StringBuilder(DOUBLE_QUOTE_STRING).append(s).append(DOUBLE_QUOTE_STRING).toString() : s;
   }
 
   public static void ensureExecutable()
@@ -93,21 +109,56 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
     }
   }
 
+  static {
+    ensureExecutable();
+  }
+
   public ScriptsHelper getStartupHelper()
   {
-    return new ScriptsHelper()
-    {
-      public ExecutableObject getDefaultScript(final CommonModel model)
-      {
-        final File jettyLauncherFile = getJettyLauncherFile();
-        return new CommandLineExecutableObject(new String[]{ jettyLauncherFile.getAbsolutePath() }, null);
-      }
-    };
+    return null;
   }
 
   public ScriptsHelper getShutdownHelper()
   {
-    return new ScriptsHelper()
+    return null;
+  }
+
+  public ScriptHelper createStartupScriptHelper(final ProgramRunner runner)
+  {
+    return new ScriptHelper()
+    {
+      public ExecutableObject getDefaultScript(final CommonModel model)
+      {
+        final File jettyLauncherFile = getJettyLauncherFile();
+        final JettyModel jettyModel = (JettyModel) model.getServerModel();
+        String arguments = null;
+
+        try {
+          final String[] configFilePaths = jettyModel.getActiveConfigFilePaths();
+          final File scratchDirectory = jettyModel.getScratchDirectory();
+          final StringBuilder argumentList = new StringBuilder();
+
+          for (final String configFilePath : configFilePaths) {
+            argumentList.append(' ').append(quoteIfNecessary(configFilePath));
+          }
+
+          argumentList.append(' ').append(quoteIfNecessary(new File(scratchDirectory, JETTY_CONTEXT_DEPLOYER_CONFIG_FILE_NAME).getPath()));
+          arguments = argumentList.toString();
+        }
+        catch (RuntimeConfigurationError runtimeConfigurationError) {
+          // Ignore - probably means we're being called when a new run/debug
+          // configuration is being created i.e. before the user has been able
+          // to choose an application server configuration
+        }
+
+        return new CommandLineExecutableObject(new String[]{ jettyLauncherFile.getAbsolutePath() }, arguments);
+      }
+    };
+  }
+
+  public ScriptHelper createShutdownScriptHelper(final ProgramRunner runner)
+  {
+    return new ScriptHelper()
     {
       public ExecutableObject getDefaultScript(final CommonModel model)
       {
@@ -127,7 +178,7 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
         final List<EnvironmentVariable> vars = new ArrayList<EnvironmentVariable>();
 
         try {
-          final ProjectJdk projectJdk = ProjectRootManager.getInstance(model.getProject()).getProjectJdk();
+          final Sdk projectJdk = ProjectRootManager.getInstance(model.getProject()).getProjectJdk();
 
           if (projectJdk != null) {
             vars.add(new EnvironmentVariable(
@@ -145,18 +196,13 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
           vars.add(new EnvironmentVariable(JettyConstants.JETTY_HOME_ENV_VAR, jettyModel.getHomeDirectory(), true));
           final int stopPort = jettyModel.getStopPort();
 
+          // If the stop port is zero then the call is for the startup helper
+          //
           if (stopPort == 0) {
-            final String[] configFilePaths = jettyModel.getActiveConfigFilePaths();
-            final File scratchDirectory = jettyModel.getScratchDirectory();
-            final StringBuilder sb = new StringBuilder(JETTY_START_COMMAND);
-
-            for (final String configFilePath : configFilePaths) {
-              sb.append(' ').append(configFilePath);
-            }
-
-            sb.append(' ').append(new File(scratchDirectory, JETTY_CONTEXT_DEPLOYER_CONFIG_FILE_NAME));
-            vars.add(new EnvironmentVariable(JettyConstants.JETTY_OPTS_ENV_VAR, sb.toString(), true));
+            vars.add(new EnvironmentVariable(JettyConstants.JETTY_OPTS_ENV_VAR, JETTY_START_COMMAND, true));
           }
+          // Otherwise the call is for the shutdown helper
+          //
           else {
             final String stopKey = jettyModel.getStopKey();
             final String jettyOptsEnvVar = MessageFormat.format(JETTY_STOP_COMMAND_TEMPLATE, stopPort, stopKey);

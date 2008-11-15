@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Mark Scott
+ * Copyright 2007, 2008 Mark Scott
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,17 +32,17 @@ import javax.swing.Icon;
 public class JettyRunConfigurationType extends J2EEConfigurationType
 {
   protected RunConfiguration createJ2EEConfigurationTemplate(
-      final ConfigurationFactory factory, final Project project, final boolean isLocal)
+    final ConfigurationFactory factory, final Project project, final boolean isLocal)
   {
     final JettyModel jettyModel = new JettyModel();
     final JettyStartupPolicy jettyStartupPolicy = new JettyStartupPolicy();
 
     return J2EEConfigurationFactory.getInstance().createJ2EERunConfiguration(factory,
-        project,
-        jettyModel,
-        JettyManager.getInstance(),
-        isLocal,
-        jettyStartupPolicy);
+      project,
+      jettyModel,
+      JettyManager.getInstance(),
+      isLocal,
+      jettyStartupPolicy);
   }
 
   public String getDisplayName()
@@ -60,7 +60,9 @@ public class JettyRunConfigurationType extends J2EEConfigurationType
     return JettyManager.getIcon();
   }
 
-  @NonNls @NotNull public String getComponentName()
+  @NonNls
+  @NotNull
+  public String getId()
   {
     return getClass().getName();
   }

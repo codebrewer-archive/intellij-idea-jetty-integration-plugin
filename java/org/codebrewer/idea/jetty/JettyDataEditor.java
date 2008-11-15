@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Mark Scott
+ * Copyright 2007, 2008 Mark Scott
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -231,11 +231,12 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
         final List<JettyPersistentData.JettyConfigurationFile> configFilesList =
             new ArrayList<JettyPersistentData.JettyConfigurationFile>(configFiles.length);
 
-        for (int i = 0; i < configFiles.length; i++) {
-          final String configFilePath = new File(configDirPath, configFiles[i]).getAbsolutePath();
+        for (final String configFile : configFiles) {
+          final String configFilePath = new File(configDirPath, configFile).getAbsolutePath();
 
           try {
-            configFilesList.add(new JettyPersistentData.JettyConfigurationFile(configFilePath, true));
+            configFilesList.add(new JettyPersistentData.JettyConfigurationFile(
+              configFilePath, JettyConstants.JETTY_XML_FILE_NAME.equals(configFile)));
           }
           catch (ConfigurationException e) {
             // Shouldn't happen unless the file changes on disk in a small time window...
@@ -247,7 +248,15 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
           public int compare(
               final JettyPersistentData.JettyConfigurationFile o1, final JettyPersistentData.JettyConfigurationFile o2)
           {
-            return o1.getFile().getAbsolutePath().compareTo(o2.getFile().getAbsolutePath());
+            if (JettyConstants.JETTY_XML_FILE_NAME.equals(o1.getFile().getName())) {
+              return -1;
+            }
+            else if (JettyConstants.JETTY_XML_FILE_NAME.equals(o2.getFile().getName())) {
+              return 1;
+            }
+            else {
+              return o1.getFile().getAbsolutePath().compareTo(o2.getFile().getAbsolutePath());
+            }
           }
         });
 
@@ -350,13 +359,13 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
 
       chosenFiles = fileChooserDialog.choose(initialSelection, project);
 
-      if (chosenFiles != null && chosenFiles.length > 0) {
+      if (chosenFiles.length > 0) {
         final ConfigurationFileTableModel model = (ConfigurationFileTableModel) table.getModel();
         String path;
         JettyPersistentData.JettyConfigurationFile file;
 
-        for (int i = 0; i < chosenFiles.length; i++) {
-          path = chosenFiles[i].getPath();
+        for (final VirtualFile chosenFile : chosenFiles) {
+          path = chosenFile.getPath();
 
           try {
             file = new JettyPersistentData.JettyConfigurationFile(path, true);
@@ -442,7 +451,7 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
           FileChooserFactory.getInstance().createFileChooser(JETTY_CONFIGURATION_FILE_CHOOSER_DESCRIPTOR, project);
       final VirtualFile[] chosenFile = fileChooserDialog.choose(initialSelection, project);
 
-      if (chosenFile != null && chosenFile.length == 1) {
+      if (chosenFile.length == 1) {
         final ConfigurationFileTableModel model = (ConfigurationFileTableModel) table.getModel();
         final String path = chosenFile[0].getPath();
 
