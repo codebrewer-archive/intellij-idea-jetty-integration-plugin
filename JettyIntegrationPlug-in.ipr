@@ -283,6 +283,7 @@
       <module name="JettyIntegrationPlug-in" />
       <option name="VM_PARAMETERS" value="-XX:MaxPermSize=128m" />
       <option name="PROGRAM_PARAMETERS" value="" />
+      <log_file path="/home/mark/.idea/sandboxes/idea-8.0/system/log/idea.log" checked="false" skipped="true" show_all="false" alias="IDEA LOG" />
       <RunnerSettings RunnerId="Debug">
         <option name="DEBUG_PORT" value="60749" />
         <option name="TRANSPORT" value="0" />

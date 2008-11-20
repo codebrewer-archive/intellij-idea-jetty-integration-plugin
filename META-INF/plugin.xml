@@ -7,7 +7,12 @@
   <depends>com.intellij.javaee</depends>
   <vendor email="mark@codebrewer.org" logo="/images/jetty16x16.png">Codebrewer</vendor>
   <change-notes>
-    <![CDATA[<b>Version 0.3.1 (Build 51)</b>
+    <![CDATA[<b>Version 0.4.0 (Build 53)</b>
+<ul>
+<li>New: Support JSP debugging.</li>
+<li>New: Detect Hightide installations when creating Jetty Application Server configurations.</li>
+</ul>
+<b>Version 0.3.1 (Build 51)</b>
 <ul>
 <li>New: Updated for IDEA 8.x.</li>
 <li>Fixed: Launch scripts fail when Java executable path and Jetty configuration file paths contain spaces.</li>
