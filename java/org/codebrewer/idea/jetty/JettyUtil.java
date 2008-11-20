@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Mark Scott
+ * Copyright 2007, 2008 Mark Scott
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,8 +49,10 @@ import java.io.IOException;
  */
 public class JettyUtil
 {
-  private static final JettyVersionChecker[] JETTY_VERSION_CHECKERS =
-    new JettyVersionChecker[]{ new Jetty6xVersionFileChecker(), new Jetty4x5xVersionFileChecker() };
+  private static final JettyVersionChecker[] JETTY_VERSION_CHECKERS = new JettyVersionChecker[]{
+    new Hightide6xVersionFileChecker(),
+    new Jetty6xVersionFileChecker(),
+    new Jetty4x5xVersionFileChecker() };
   private static final String EXCEPTION_TEXT_CANNOT_LOAD_FILE = "exception.text.cannot.load.file.bacause.of.1";
 
   private static final String EMPTY_STRING = "";
@@ -235,10 +237,6 @@ public class JettyUtil
   {
     try {
       final Document xmlDocument = JDOMUtil.loadDocument(new File(xmlPath));
-
-      if (xmlDocument == null) {
-        throw new JettyException(JettyBundle.message("exception.text.cannot.find.file", xmlPath));
-      }
 
       return xmlDocument;
     }
