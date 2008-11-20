@@ -36,7 +36,6 @@ import org.jetbrains.annotations.NonNls;
  */
 public class JettyServerInstance extends DefaultServerInstance
 {
-  // Todo - investigate Jetty startup messages (at least, don't restrict to 6.1)
   @NonNls
   protected static final String STARTING_MESSAGE = "-DSTOP.KEY=";
 
@@ -71,8 +70,7 @@ public class JettyServerInstance extends DefaultServerInstance
           @Override
           protected String getGeneratedClassesPackage()
           {
-            // Todo - what's appropriate here?  user-configurable?
-            return "org.mortbay.jetty.jsp";
+            return "org.apache.jsp";
           }
         };
         process.appendPositionManager(positionManager);
