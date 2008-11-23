@@ -275,7 +275,7 @@
       <module fileurl="file://$PROJECT_DIR$/JettyIntegrationPlug-in.iml" filepath="$PROJECT_DIR$/JettyIntegrationPlug-in.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5" assert-keyword="true" jdk-15="true" project-jdk-name="1.6.0 Update 10" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_5" assert-keyword="true" jdk-15="true" project-jdk-name="1.5.0 Update 15" project-jdk-type="JavaSDK">
     <output url="file:///home/mark/classbox/IDEA/idea_plugins/jetty_plugin" />
   </component>
   <component name="ProjectRunConfigurationManager">
@@ -311,46 +311,6 @@
         <entry key="$PROJECT_DIR$">
           <value>
             <SvnBranchConfiguration>
-              <option name="branchMap">
-                <map>
-                  <entry key="svn+ssh://svn.hq.codebrewer.com/idea_plugins/jetty_plugin/tags">
-                    <value>
-                      <list>
-                        <SvnBranchItem>
-                          <option name="creationDateMillis" value="1226757019333" />
-                          <option name="revision" value="69" />
-                          <option name="url" value="svn+ssh://svn.hq.codebrewer.com/idea_plugins/jetty_plugin/tags/release-0.3.1" />
-                        </SvnBranchItem>
-                        <SvnBranchItem>
-                          <option name="creationDateMillis" value="1187559589800" />
-                          <option name="revision" value="49" />
-                          <option name="url" value="svn+ssh://svn.hq.codebrewer.com/idea_plugins/jetty_plugin/tags/idea-6.x_release-0.3.0" />
-                        </SvnBranchItem>
-                        <SvnBranchItem>
-                          <option name="creationDateMillis" value="1187537301621" />
-                          <option name="revision" value="41" />
-                          <option name="url" value="svn+ssh://svn.hq.codebrewer.com/idea_plugins/jetty_plugin/tags/release-0.3.0" />
-                        </SvnBranchItem>
-                        <SvnBranchItem>
-                          <option name="creationDateMillis" value="1173027876303" />
-                          <option name="revision" value="23" />
-                          <option name="url" value="svn+ssh://svn.hq.codebrewer.com/idea_plugins/jetty_plugin/tags/release-0.2.0" />
-                        </SvnBranchItem>
-                        <SvnBranchItem>
-                          <option name="creationDateMillis" value="1171323581703" />
-                          <option name="revision" value="11" />
-                          <option name="url" value="svn+ssh://svn.hq.codebrewer.com/idea_plugins/jetty_plugin/tags/release-0.1.1" />
-                        </SvnBranchItem>
-                        <SvnBranchItem>
-                          <option name="creationDateMillis" value="1171120982080" />
-                          <option name="revision" value="3" />
-                          <option name="url" value="svn+ssh://svn.hq.codebrewer.com/idea_plugins/jetty_plugin/tags/release-0.1.0" />
-                        </SvnBranchItem>
-                      </list>
-                    </value>
-                  </entry>
-                </map>
-              </option>
               <option name="branchUrls">
                 <list>
                   <option value="svn+ssh://svn.hq.codebrewer.com/idea_plugins/jetty_plugin/branches" />
