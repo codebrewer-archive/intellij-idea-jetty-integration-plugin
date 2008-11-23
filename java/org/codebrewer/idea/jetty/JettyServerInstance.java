@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Mark Scott
+ * Copyright 2007, 2008 Mark Scott
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,13 +36,12 @@ import org.jetbrains.annotations.NonNls;
  */
 public class JettyServerInstance extends DefaultServerInstance
 {
-  // Todo - investigate Jetty startup messages (at least, don't restrict to 6.1)
   @NonNls
-  protected static final String STARTING_MESSAGE = "jetty-6.1.";
+  protected static final String STARTING_MESSAGE = "-DSTOP.KEY=";
 
   private static boolean isStartingMessage(final String text)
   {
-    return text.contains(STARTING_MESSAGE);
+    return text.startsWith(STARTING_MESSAGE);
   }
 
   private boolean isStartedUp = false;
@@ -71,8 +70,7 @@ public class JettyServerInstance extends DefaultServerInstance
           @Override
           protected String getGeneratedClassesPackage()
           {
-            // Todo - what's appropriate here?  user-configurable?
-            return "org.mortbay.jetty.jsp";
+            return "org.apache.jsp";
           }
         };
         process.appendPositionManager(positionManager);
@@ -102,7 +100,7 @@ public class JettyServerInstance extends DefaultServerInstance
             }
           }
 
-          if (!isStartedUp && isStartingMessage(text)) {
+          if (!isStartedUp && ProcessOutputTypes.STDOUT.equals(outputType) && isStartingMessage(text)) {
             isStartedUp = true;
           }
         }

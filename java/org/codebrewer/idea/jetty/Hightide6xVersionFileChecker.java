@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, 2008 Mark Scott
+ * Copyright 2008 Ben Gidley
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,18 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * @author Mark Scott
- * @version $Id$
+ * <p>
+ * Version of this class to support Hightide (commercially supported version of
+ * Jetty).
+ * </p>
  */
-public class Jetty6xVersionFileChecker extends AbstractJettyVersionFileChecker
+public class Hightide6xVersionFileChecker extends AbstractJettyVersionFileChecker
 {
   @NonNls private static final String VERSION_FILE_NAME = "VERSION.txt";
-  @NonNls private static final String VERSION_PATTERN = "^jetty-(6\\.1\\.\\d+) .*";
+  @NonNls private static final String VERSION_PATTERN = "^hightide-(.*) - .*";
 
-  @NotNull public String getVersionFileName()
+  @NotNull
+  public String getVersionFileName()
   {
     return VERSION_FILE_NAME;
   }

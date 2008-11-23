@@ -41,9 +41,13 @@
       <include name="extensions.jar" />
       <include name="jdom.jar" />
       <include name="openapi.jar" />
+      <include name="util.jar" />
     </fileset>
     <fileset dir="${idea.home}/plugins/JavaEE/lib">
       <include name="javaee-openapi.jar" />
+    </fileset>
+    <fileset dir="${idea.home}/plugins/PersistenceSupport/lib">
+      <include name="persistence-openapi.jar" />
     </fileset>
   </path>
 
