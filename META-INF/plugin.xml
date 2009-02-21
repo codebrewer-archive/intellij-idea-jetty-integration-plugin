@@ -2,12 +2,16 @@
 <idea-plugin version="2">
   <name>Jetty Integration</name>
   <id>Jetty Integration</id>
-  <description>Allows configuration and use of the Jetty webserver directly from IntelliJ IDEA, for running/debugging web applications.  JSP debugging is not yet implemented.</description>
+  <description>Allows configuration and use of the Jetty webserver directly from IntelliJ IDEA, for running/debugging web applications.</description>
   <version>##PLUGIN_VERSION##</version>
   <depends>com.intellij.javaee</depends>
   <vendor email="mark@codebrewer.org" logo="/images/jetty16x16.png">Codebrewer</vendor>
   <change-notes>
-    <![CDATA[<b>Version 0.4.0 (Build 53)</b>
+    <![CDATA[<b>Version 0.4.1 (Build 54)</b>
+<ul>
+<li>Fixed: Updated version dependency information for compatibility with IDEA 8.1.</li>
+</ul>
+<b>Version 0.4.0 (Build 53)</b>
 <ul>
 <li>New: Support JSP debugging.</li>
 <li>New: Detect Hightide installations when creating Jetty Application Server configurations.</li>
