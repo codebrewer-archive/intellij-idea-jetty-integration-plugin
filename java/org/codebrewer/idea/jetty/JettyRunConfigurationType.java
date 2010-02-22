@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, 2008 Mark Scott
+ * Copyright 2007, 2008, 2010 Mark Scott, Peter Niederwieser
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import javax.swing.Icon;
 
 /**
  * @author Mark Scott
+ * @author Peter Niederwieser
  * @version $Id$
  */
 public class JettyRunConfigurationType extends J2EEConfigurationType
@@ -57,7 +58,7 @@ public class JettyRunConfigurationType extends J2EEConfigurationType
 
   public Icon getIcon()
   {
-    return JettyManager.getIcon();
+    return JettyManager.getInstance().getIcon();
   }
 
   @NonNls

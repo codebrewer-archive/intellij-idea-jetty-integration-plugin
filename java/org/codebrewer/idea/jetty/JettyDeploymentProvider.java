@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Mark Scott
+ * Copyright 2007, 2010 Mark Scott, Peter Niederwieser
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,11 @@
  */
 package org.codebrewer.idea.jetty;
 
-import com.intellij.facet.pointers.FacetPointer;
 import com.intellij.javaee.deployment.DeploymentManager;
 import com.intellij.javaee.deployment.DeploymentMethod;
 import com.intellij.javaee.deployment.DeploymentModel;
 import com.intellij.javaee.deployment.DeploymentProvider;
 import com.intellij.javaee.deployment.DeploymentStatus;
-import com.intellij.javaee.facet.JavaeeFacet;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.javaee.serverInstances.J2EEServerInstance;
 import com.intellij.openapi.options.SettingsEditor;
@@ -29,7 +27,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.util.io.FileUtil;
-import static org.codebrewer.idea.jetty.JettyConstants.JETTY_CONTEXT_DEPLOYER_CONFIG_FILE_NAME;
+import com.intellij.packaging.artifacts.Artifact;
+import com.intellij.packaging.artifacts.ArtifactPointer;
 import org.jdom.Document;
 import org.jdom.output.XMLOutputter;
 import org.jetbrains.annotations.NonNls;
@@ -40,11 +39,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import static org.codebrewer.idea.jetty.JettyConstants.JETTY_CONTEXT_DEPLOYER_CONFIG_FILE_NAME;
+
 /**
  * @author Mark Scott
+ * @author Peter Niederwieser
  * @version $Id$
  */
-public class JettyDeploymentProvider implements DeploymentProvider
+public class JettyDeploymentProvider extends DeploymentProvider
 {
   private static void setDeploymentStatus(J2EEServerInstance instance,
                                           JettyModuleDeploymentModel model,
@@ -52,10 +54,9 @@ public class JettyDeploymentProvider implements DeploymentProvider
   {
     final CommonModel configuration = instance.getCommonModel();
     final JettyModel jettyConfiguration = ((JettyModel) configuration.getServerModel());
-    final JavaeeFacet facet = model.getFacet();
     final DeploymentManager deploymentManager = DeploymentManager.getInstance(jettyConfiguration.getProject());
 
-    deploymentManager.setDeploymentStatus(facet, status, configuration, instance);
+    deploymentManager.setDeploymentStatus(model, status, configuration, instance);
   }
 
   public static void prepareServer(final JettyModel jettyModel) throws JettyException
@@ -101,31 +102,31 @@ public class JettyDeploymentProvider implements DeploymentProvider
     DeploymentStatus deploymentStatus = DeploymentStatus.NOT_DEPLOYED;
 
     final JettyModuleDeploymentModel moduleDeploymentModel = (JettyModuleDeploymentModel) model;
-    final JavaeeFacet facet = model.getFacet();
+    final ArtifactPointer artifactPointer = model.getArtifactPointer();
 
-    if (facet != null) {
+    if (artifactPointer != null) {
       try {
         final Document moduleDeploymentDocument = JettyUtil.getContextDeploymentDocument(project, moduleDeploymentModel);
         final JettyModel jettyModel = (JettyModel) moduleDeploymentModel.getServerModel();
         final File destinationDirectory = JettyUtil.getContextDeployerConfigurationDirectory(jettyModel.getScratchDirectory());
-        final File facetConfigurationFile = new File(destinationDirectory, facet.getName() + ".xml");
+        final File artifactConfigurationFile = new File(destinationDirectory, artifactPointer.getArtifactName() + ".xml");
         final XMLOutputter xmlOutputter = JDOMUtil.createOutputter(System.getProperty("line.separator"));
 
         OutputStream out = null;
 
         try {
-          out = new FileOutputStream(facetConfigurationFile);
+          out = new FileOutputStream(artifactConfigurationFile);
           xmlOutputter.output(moduleDeploymentDocument, out);
           deploymentStatus = DeploymentStatus.DEPLOYED;
         }
         catch (IOException e) {
           deploymentStatus = DeploymentStatus.FAILED;
           Messages.showErrorDialog(
-            project, e.getMessage(), JettyBundle.message("message.text.error.deploying.facet", facet.getName()));
+            project, e.getMessage(), JettyBundle.message("message.text.error.deploying.artifact", artifactPointer.getArtifactName()));
         }
         finally {
           if (out != null) {
-            facetConfigurationFile.deleteOnExit();
+            artifactConfigurationFile.deleteOnExit();
 
             try {
               out.close();
@@ -140,7 +141,7 @@ public class JettyDeploymentProvider implements DeploymentProvider
         deploymentStatus = DeploymentStatus.FAILED;
         JOptionPane.showMessageDialog(null,
           e.getMessage(),
-          JettyBundle.message("message.text.error.deploying.facet", facet.getName()),
+          JettyBundle.message("message.text.error.deploying.artifact", artifactPointer.getArtifactName()),
           JOptionPane.ERROR_MESSAGE);
       }
     }
@@ -148,16 +149,15 @@ public class JettyDeploymentProvider implements DeploymentProvider
     setDeploymentStatus(instance, moduleDeploymentModel, deploymentStatus);
   }
 
-  public DeploymentModel createNewDeploymentModel(CommonModel configuration,
-                                                  FacetPointer<JavaeeFacet> javaeeFacetPointer)
+  public DeploymentModel createNewDeploymentModel(CommonModel configuration, ArtifactPointer artifactPointer)
   {
-    return new JettyModuleDeploymentModel(configuration, javaeeFacetPointer);
+    return new JettyModuleDeploymentModel(configuration, artifactPointer);
   }
 
   public SettingsEditor<DeploymentModel> createAdditionalDeploymentSettingsEditor(CommonModel configuration,
-                                                                                  JavaeeFacet javaeeFacet)
+                                                                                  Artifact artifact)
   {
-    return new JettyDeploymentSettingsEditor(configuration, javaeeFacet);
+    return new JettyDeploymentSettingsEditor(configuration, artifact);
   }
 
   public void startUndeploy(J2EEServerInstance activeInstance, DeploymentModel model)
@@ -165,14 +165,14 @@ public class JettyDeploymentProvider implements DeploymentProvider
     DeploymentStatus deploymentStatus = DeploymentStatus.NOT_DEPLOYED;
 
     final JettyModuleDeploymentModel moduleDeploymentModel = (JettyModuleDeploymentModel) model;
-    final JavaeeFacet facet = model.getFacet();
+    final ArtifactPointer artifactPointer = model.getArtifactPointer();
 
-    if (facet != null) {
+    if (artifactPointer != null) {
       final JettyModel jettyModel = (JettyModel) moduleDeploymentModel.getServerModel();
       final File configurationDirectory = JettyUtil.getContextDeployerConfigurationDirectory(jettyModel.getScratchDirectory());
-      final File facetConfigurationFile = new File(configurationDirectory, facet.getName() + ".xml");
+      final File artifactConfigurationFile = new File(configurationDirectory, artifactPointer.getArtifactName() + ".xml");
 
-      deploymentStatus = facetConfigurationFile.delete() ? DeploymentStatus.NOT_DEPLOYED : DeploymentStatus.UNKNOWN;
+      deploymentStatus = artifactConfigurationFile.delete() ? DeploymentStatus.NOT_DEPLOYED : DeploymentStatus.UNKNOWN;
     }
 
     setDeploymentStatus(activeInstance, moduleDeploymentModel, deploymentStatus);
@@ -183,14 +183,14 @@ public class JettyDeploymentProvider implements DeploymentProvider
     DeploymentStatus deploymentStatus = DeploymentStatus.UNKNOWN;
 
     final JettyModuleDeploymentModel moduleDeploymentModel = (JettyModuleDeploymentModel) model;
-    final JavaeeFacet facet = model.getFacet();
+    final ArtifactPointer artifactPointer = model.getArtifactPointer();
 
-    if (facet != null) {
+    if (artifactPointer != null) {
       final JettyModel jettyModel = (JettyModel) moduleDeploymentModel.getServerModel();
       final File configurationDirectory = JettyUtil.getContextDeployerConfigurationDirectory(jettyModel.getScratchDirectory());
-      final File facetConfigurationFile = new File(configurationDirectory, facet.getName() + ".xml");
+      final File artifactConfigurationFile = new File(configurationDirectory, artifactPointer.getArtifactName() + ".xml");
 
-      deploymentStatus = facetConfigurationFile.exists() ? DeploymentStatus.DEPLOYED : DeploymentStatus.NOT_DEPLOYED;
+      deploymentStatus = artifactConfigurationFile.exists() ? DeploymentStatus.DEPLOYED : DeploymentStatus.NOT_DEPLOYED;
     }
 
     setDeploymentStatus(instance, (JettyModuleDeploymentModel) model, deploymentStatus);

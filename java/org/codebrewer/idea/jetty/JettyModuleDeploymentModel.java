@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Mark Scott
+ * Copyright 2007, 2010 Mark Scott, Peter Niederwieser
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,17 @@
  */
 package org.codebrewer.idea.jetty;
 
-import com.intellij.facet.pointers.FacetPointer;
 import com.intellij.javaee.deployment.DeploymentModel;
-import com.intellij.javaee.facet.JavaeeFacet;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
+import com.intellij.packaging.artifacts.ArtifactPointer;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Mark Scott
+ * @author Peter Niederwieser
  * @version $Id$
  */
 public class JettyModuleDeploymentModel extends DeploymentModel
@@ -35,9 +35,9 @@ public class JettyModuleDeploymentModel extends DeploymentModel
 
   private String contextPath = DEFAULT_CONTEXT_PATH;
 
-  public JettyModuleDeploymentModel(CommonModel project, FacetPointer<JavaeeFacet> facetPointer)
+  public JettyModuleDeploymentModel(CommonModel project, ArtifactPointer artifactPointer)
   {
-    super(project, facetPointer);
+    super(project, artifactPointer);
   }
 
   @NotNull

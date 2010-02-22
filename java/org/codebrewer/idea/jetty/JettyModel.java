@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Mark Scott
+ * Copyright 2007, 2010 Mark Scott, Peter Niederwieser
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,13 @@ import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.execution.configurations.RuntimeConfigurationException;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.javaee.appServerIntegrations.ApplicationServer;
+import com.intellij.javaee.deployment.DeploymentModel;
 import com.intellij.javaee.deployment.DeploymentProvider;
-import com.intellij.javaee.facet.JavaeeFacetUtil;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.javaee.run.configuration.ServerModel;
 import com.intellij.javaee.run.execution.DefaultOutputProcessor;
 import com.intellij.javaee.run.execution.OutputProcessor;
 import com.intellij.javaee.serverInstances.J2EEServerInstance;
-import com.intellij.javaee.web.facet.WebFacet;
-import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.DefaultJDOMExternalizer;
@@ -47,6 +45,7 @@ import java.util.Set;
 
 /**
  * @author Mark Scott
+ * @author Peter Niederwieser
  * @version $Id$
  */
 public class JettyModel implements ServerModel
@@ -231,13 +230,9 @@ public class JettyModel implements ServerModel
 
     // Todo - add those contexts already 'claimed' by active Jetty configuration files
 
-    final Module[] modules = commonModel.getModules();
-
-    for (final WebFacet webFacet : JavaeeFacetUtil.getInstance().getJavaeeFacets(WebFacet.ID, modules)) {
-      final JettyModuleDeploymentModel model =
-        (JettyModuleDeploymentModel) commonModel.getDeploymentModel(webFacet);
-
-      if (model.DEPLOY) {
+    for (final DeploymentModel deploymentModel : commonModel.getDeploymentModels()) {
+      if (deploymentModel instanceof JettyModuleDeploymentModel) {
+        final JettyModuleDeploymentModel model = (JettyModuleDeploymentModel) deploymentModel;
         final String contextPath = model.getContextPath();
 
         if (!contexts.add(contextPath)) {

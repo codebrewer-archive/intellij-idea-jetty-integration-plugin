@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, 2008 Mark Scott
+ * Copyright 2007, 2008, 2010 Mark Scott, Peter Niederwieser
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,6 @@ import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.EnvironmentUtil;
-import static org.codebrewer.idea.jetty.JettyConstants.DEFAULT_PORT;
-import static org.codebrewer.idea.jetty.JettyConstants.JETTY_CONFIG_DIRECTORY_NAME;
-import static org.codebrewer.idea.jetty.JettyConstants.JETTY_CONTEXT_DEPLOYER_CONFIG_DIR_NAME;
-import static org.codebrewer.idea.jetty.JettyConstants.JETTY_DOCTYPE_ELEMENT_NAME;
-import static org.codebrewer.idea.jetty.JettyConstants.JETTY_DOCTYPE_PUBLIC_ID;
-import static org.codebrewer.idea.jetty.JettyConstants.JETTY_DOCTYPE_SYSTEM_ID;
-import static org.codebrewer.idea.jetty.JettyConstants.JETTY_HOME_ENV_VAR;
 import org.jdom.DocType;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -43,8 +36,17 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 
+import static org.codebrewer.idea.jetty.JettyConstants.DEFAULT_PORT;
+import static org.codebrewer.idea.jetty.JettyConstants.JETTY_CONFIG_DIRECTORY_NAME;
+import static org.codebrewer.idea.jetty.JettyConstants.JETTY_CONTEXT_DEPLOYER_CONFIG_DIR_NAME;
+import static org.codebrewer.idea.jetty.JettyConstants.JETTY_DOCTYPE_ELEMENT_NAME;
+import static org.codebrewer.idea.jetty.JettyConstants.JETTY_DOCTYPE_PUBLIC_ID;
+import static org.codebrewer.idea.jetty.JettyConstants.JETTY_DOCTYPE_SYSTEM_ID;
+import static org.codebrewer.idea.jetty.JettyConstants.JETTY_HOME_ENV_VAR;
+
 /**
  * @author Mark Scott
+ * @author Peter Niederwieser
  * @version $Id$
  */
 public class JettyUtil
@@ -110,7 +112,7 @@ public class JettyUtil
       throw new JettyException(JettyBundle.message("exception.text.null.deployment.source"));
     }
 
-    final DeploymentSource deploymentMethod = model.getSpecifiedDeploymentSource(); // DeploymentSource.FROM_JAR or DeploymentSource.FROM_EXPLODED
+    final DeploymentSource deploymentMethod = model.getDeploymentSource(); // DeploymentSource.FROM_JAR or DeploymentSource.FROM_EXPLODED
     final String contextPath = model.getContextPath();
     final DocType docType = new DocType(JETTY_DOCTYPE_ELEMENT_NAME, JETTY_DOCTYPE_PUBLIC_ID, JETTY_DOCTYPE_SYSTEM_ID);
     final Element rootElement = new Element(JETTY_DOCTYPE_ELEMENT_NAME);

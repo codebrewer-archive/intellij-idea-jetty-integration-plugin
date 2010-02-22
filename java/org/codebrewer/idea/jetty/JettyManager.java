@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, 2008 Mark Scott
+ * Copyright 2007, 2008, 2010 Mark Scott, Peter Niederwieser
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import java.util.Collection;
 
 /**
  * @author Mark Scott
+ * @author Peter Niederwieser
  * @version $Id$
  */
 public class JettyManager extends AppServerIntegration
@@ -48,7 +49,8 @@ public class JettyManager extends AppServerIntegration
   @NonNls
   public static final String PLUGIN_NAME = "JettyIntegration";
 
-  public static Icon getIcon()
+  @Override
+  public Icon getIcon()
   {
     return ICON_JCOLON;
   }

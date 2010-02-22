@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2007 Mark Scott
+  ~ Copyright 2007, 2008, 2010 Mark Scott, Peter Niederwieser
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -49,6 +49,9 @@
     <fileset dir="${idea.home}/plugins/PersistenceSupport/lib">
       <include name="persistence-openapi.jar" />
     </fileset>
+    <fileset dir="${idea.home}/plugins/DatabaseSupport/lib">
+      <include name="database-openapi.jar" />
+    </fileset>
   </path>
 
   <target name="build"
@@ -66,7 +69,7 @@
 
   <target name="compile">
     <mkdir dir="${build}/classes" />
-    <javac debug="true" destdir="${build}/classes" source="1.5">
+    <javac debug="true" destdir="${build}/classes" source="1.6">
       <src path="${src}" />
       <classpath refid="classpath" />
     </javac>
@@ -153,7 +156,7 @@
       Version ${build.version.major}.${build.version.minor}.${build.version.revision}.${build.number}
       ${build.date}
 
-      To compile using ANT, first edit idea.build.properties as appropriate.
+      To compile using Ant, first edit idea.build.properties as appropriate.
 
       The 'build' target will create a zip archive suitable for extracting into
       IDEA's plug-ins directory. The 'deploy' target will unzip the archive into an
