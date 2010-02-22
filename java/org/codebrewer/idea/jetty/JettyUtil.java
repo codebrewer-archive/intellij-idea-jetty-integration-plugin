@@ -220,9 +220,9 @@ public class JettyUtil
       final DocType docType = document.getDocType();
 
       if (docType != null) {
-        final boolean isValidElementName = docType.getElementName().equals(JETTY_DOCTYPE_ELEMENT_NAME);
-        final boolean isValidPublicID = docType.getPublicID().equals(JETTY_DOCTYPE_PUBLIC_ID);
-        final boolean isValidSystemID = docType.getSystemID().equals(JETTY_DOCTYPE_SYSTEM_ID);
+        final boolean isValidElementName = JETTY_DOCTYPE_ELEMENT_NAME.equals(docType.getElementName());
+        final boolean isValidPublicID = JETTY_DOCTYPE_PUBLIC_ID.equals(docType.getPublicID());
+        final boolean isValidSystemID = JETTY_DOCTYPE_SYSTEM_ID.equals(docType.getSystemID());
 
         result = isValidElementName && isValidPublicID && isValidSystemID;
       }
