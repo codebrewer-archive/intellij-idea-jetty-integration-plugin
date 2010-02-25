@@ -52,6 +52,7 @@ import static org.codebrewer.idea.jetty.JettyConstants.JETTY_HOME_ENV_VAR;
 public class JettyUtil
 {
   private static final JettyVersionChecker[] JETTY_VERSION_CHECKERS = new JettyVersionChecker[]{
+    new JettyStartJarVersionChecker(),
     new Hightide6xVersionFileChecker(),
     new Jetty6xVersionFileChecker(),
     new Jetty4x5xVersionFileChecker() };
