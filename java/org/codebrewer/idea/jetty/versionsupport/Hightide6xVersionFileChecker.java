@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 Ben Gidley
+ * Copyright 2008, 2010 Ben Gidley
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.codebrewer.idea.jetty;
+package org.codebrewer.idea.jetty.versionsupport;
 
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +23,9 @@ import org.jetbrains.annotations.NotNull;
  * Version of this class to support Hightide (commercially supported version of
  * Jetty).
  * </p>
+ *
+ * @author Ben Gidley
+ * @version $Id$
  */
 public class Hightide6xVersionFileChecker extends AbstractJettyVersionFileChecker
 {

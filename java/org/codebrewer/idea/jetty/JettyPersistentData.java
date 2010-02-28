@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Mark Scott
+ * Copyright 2007, 2010 Mark Scott, Chris Miller
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,12 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMExternalizer;
 import com.intellij.openapi.util.WriteExternalException;
+import org.codebrewer.idea.jetty.versionsupport.JettyVersionHelper;
+import org.codebrewer.idea.jetty.versionsupport.JettyVersionHelperFactory;
 import org.jdom.Element;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,12 +33,15 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * <p>
  * A class that is responsible for persisting and restoring configuration
  * information about a single Jetty application server definition.  Persisted
  * data comprises the location of the Jetty installation, its version number and
  * the location and active status of any configuration files used.
+ * </p>
  *
  * @author Mark Scott
+ * @author Chris Miller
  * @version $Id$
  */
 public class JettyPersistentData implements ApplicationServerPersistentData
@@ -43,30 +49,29 @@ public class JettyPersistentData implements ApplicationServerPersistentData
   /**
    * Key used to persist the active state of a single Jetty configuration file.
    */
-  @NonNls private static final String CONFIGURATION_ACTIVE_KEY = "active";
+  @NonNls
+  private static final String CONFIGURATION_ACTIVE_KEY = "active";
 
   /**
    * Key used to persist the set of Jetty configuration files.
    */
-  @NonNls private static final String CONFIGURATIONS_KEY = "configurations";
+  @NonNls
+  private static final String CONFIGURATIONS_KEY = "configurations";
 
   /**
    * Key used to persist the path to a single Jetty configuration file.
    */
-  @NonNls private static final String FILE_KEY = "file";
+  @NonNls
+  private static final String FILE_KEY = "file";
 
   /**
    * Key used to persist the path to the Jetty installation.
    */
-  @NonNls private static final String PATH_KEY = "path";
+  @NonNls
+  private static final String PATH_KEY = "path";
 
-  /**
-   * Key used to persist the detected version of the Jetty installation.
-   */
-  @NonNls private static final String VERSION_KEY = "version";
-
-  private String jettyHome = "";
-  private String jettyVersion = "";
+  private String jettyHome;
+  private JettyVersionHelper versionHelper;
   private List<JettyConfigurationFile> jettyConfigurationFiles = new ArrayList<JettyConfigurationFile>();
 
   public JettyPersistentData()
@@ -74,19 +79,22 @@ public class JettyPersistentData implements ApplicationServerPersistentData
     jettyHome = JettyUtil.getDefaultLocation();
   }
 
-  public @NotNull List<JettyConfigurationFile> getJettyConfigurationFiles()
+  @NotNull
+  public List<JettyConfigurationFile> getJettyConfigurationFiles()
   {
     return Collections.unmodifiableList(jettyConfigurationFiles);
   }
 
-  public @NotNull String getJettyHome()
+  @NotNull
+  public String getJettyHome()
   {
     return jettyHome;
   }
 
-  public @NotNull String getJettyVersion()
+  @Nullable
+  public JettyVersionHelper getJettyVersionHelper()
   {
-    return jettyVersion;
+    return versionHelper;
   }
 
   public void setJettyConfigurationFiles(final List<JettyConfigurationFile> jettyConfigurationFiles)
@@ -104,9 +112,9 @@ public class JettyPersistentData implements ApplicationServerPersistentData
     this.jettyHome = jettyHome == null ? "" : jettyHome;
   }
 
-  public void setJettyVersion(final String jettyVersion)
+  public void setJettyVersionHelper(final JettyVersionHelper jettyVersionHelper)
   {
-    this.jettyVersion = jettyVersion == null ? "" : jettyVersion;
+    versionHelper = jettyVersionHelper;
   }
 
   public void readExternal(final Element element) throws InvalidDataException
@@ -115,29 +123,25 @@ public class JettyPersistentData implements ApplicationServerPersistentData
 
     if (persistedJettyHome != null) {
       jettyHome = persistedJettyHome;
-    }
-
-    final String persistedJettyVersion = JDOMExternalizer.readString(element, VERSION_KEY);
-
-    if (persistedJettyVersion != null) {
-      jettyVersion = persistedJettyVersion;
+      versionHelper = JettyVersionHelperFactory.INSTANCE.getJettyVersionHelper(new File(jettyHome));
     }
 
     final Element configurationFilesElement = element.getChild(CONFIGURATIONS_KEY);
-    if (configurationFilesElement != null) {
+
+    if (configurationFilesElement != null && versionHelper != null) {
       final List configurationFileElements = configurationFilesElement.getChildren(FILE_KEY);
 
-      for (int i = 0; i < configurationFileElements.size(); i++) {
-        final Element configurationFileElement = (Element) configurationFileElements.get(i);
-        final String path = JDOMExternalizer.readString(configurationFileElement, PATH_KEY);
-        final boolean isActive = JDOMExternalizer.readBoolean(configurationFileElement, CONFIGURATION_ACTIVE_KEY);
+      for (final Object configurationFileElement : configurationFileElements) {
+        final String path = JDOMExternalizer.readString((Element) configurationFileElement, PATH_KEY);
+        final boolean isActive = JDOMExternalizer.readBoolean((Element) configurationFileElement, CONFIGURATION_ACTIVE_KEY);
 
         try {
-          final JettyConfigurationFile configurationFile = new JettyConfigurationFile(path, isActive);
+          final JettyConfigurationFile configurationFile = new JettyConfigurationFile(versionHelper, path, isActive);
           jettyConfigurationFiles.add(configurationFile);
         }
         catch (ConfigurationException e) {
-          e.printStackTrace(); // Todo - logging
+          throw new InvalidDataException(
+            JettyBundle.message(JettyUtil.EXCEPTION_TEXT_CANNOT_LOAD_FILE, path, e.getMessage()), e);
         }
       }
     }
@@ -146,7 +150,6 @@ public class JettyPersistentData implements ApplicationServerPersistentData
   public void writeExternal(final Element element) throws WriteExternalException
   {
     JDOMExternalizer.write(element, PATH_KEY, jettyHome);
-    JDOMExternalizer.write(element, VERSION_KEY, jettyVersion);
 
     final Element configurationFilesElement = new Element(CONFIGURATIONS_KEY);
 
@@ -168,16 +171,19 @@ public class JettyPersistentData implements ApplicationServerPersistentData
    */
   public static class JettyConfigurationFile
   {
-    @NonNls private static final String INVALID_CONFIGURATION_FILE_KEY = "exception.text.not.jetty.configuration.file";
+    @NonNls
+    private static final String INVALID_CONFIGURATION_FILE_KEY = "exception.text.not.jetty.configuration.file";
 
     private File configurationFile;
     private boolean active;
+    private final JettyVersionHelper versionHelper;
 
     /**
      * Creates an instance if the given path is that of a valid Jetty
      * configuration file (<em>i.e.</em> is a readable XML file with the correct
      * DOCTYPE declaration).
      *
+     * @param versionHelper a representation of a particular version of Jetty.
      * @param path the path to a Jetty configuration file.
      * @param active whether or not the file identified by <code>path</code> is
      * to be used when starting Jetty.
@@ -185,12 +191,15 @@ public class JettyPersistentData implements ApplicationServerPersistentData
      * @throws ConfigurationException if <code>path</code> is not that of a
      * valid Jetty configuration file.
      */
-    public JettyConfigurationFile(final String path, final boolean active) throws ConfigurationException
+    public JettyConfigurationFile(@NotNull final JettyVersionHelper versionHelper,
+                                  @NotNull final String path,
+                                  final boolean active) throws ConfigurationException
     {
-      if (!JettyUtil.isJettyConfigurationFile(path)) {
+      if (!JettyUtil.isJettyConfigurationFile(versionHelper, path)) {
         throw new ConfigurationException(JettyBundle.message(INVALID_CONFIGURATION_FILE_KEY, path));
       }
 
+      this.versionHelper = versionHelper;
       configurationFile = new File(path);
       this.active = active;
     }
@@ -212,7 +221,7 @@ public class JettyPersistentData implements ApplicationServerPersistentData
 
     public void setPath(final String path) throws ConfigurationException
     {
-      if (JettyUtil.isJettyConfigurationFile(path)) {
+      if (JettyUtil.isJettyConfigurationFile(versionHelper, path)) {
         configurationFile = new File(path);
       }
       else {

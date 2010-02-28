@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, 2010 Mark Scott, Peter Niederwieser
+ * Copyright 2007, 2010 Mark Scott, Peter Niederwieser, Chris Miller
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,9 +33,11 @@ import com.intellij.openapi.util.DefaultJDOMExternalizer;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.WriteExternalException;
+import org.codebrewer.idea.jetty.versionsupport.JettyVersionHelper;
 import org.jdom.Element;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -46,11 +48,18 @@ import java.util.Set;
 /**
  * @author Mark Scott
  * @author Peter Niederwieser
+ * @author Chris Miller
  * @version $Id$
  */
 public class JettyModel implements ServerModel
 {
-  private static final String EXCEPTION_TEXT_NO_APPLICATION_SERVER = "exception.text.application.server.not.specified";
+  @NonNls
+  private static final String EXCEPTION_TEXT_NO_APPLICATION_SERVER =
+    "exception.text.application.server.not.specified";
+
+  @NonNls
+  private static final String EXCEPTION_TEXT_NO_SAVED_JETTY_CONFIGURATION_STATE =
+    "exception.text.no.saved.jetty.configuration.state";
 
   private CommonModel commonModel;
   private String stopKey;
@@ -58,7 +67,7 @@ public class JettyModel implements ServerModel
   private File scratchDirectory;
 
   @NotNull
-  public File[] getActiveConfigFiles() throws RuntimeConfigurationError
+  private JettyPersistentData getJettyPersistentData() throws RuntimeConfigurationError
   {
     final ApplicationServer applicationServer = commonModel.getApplicationServer();
 
@@ -66,7 +75,19 @@ public class JettyModel implements ServerModel
       throw new RuntimeConfigurationError(JettyBundle.message(EXCEPTION_TEXT_NO_APPLICATION_SERVER));
     }
 
-    final JettyPersistentData jettyPersistentData = ((JettyPersistentData) applicationServer.getPersistentData());
+    final JettyPersistentData jettyPersistentData = (JettyPersistentData) applicationServer.getPersistentData();
+
+    if (jettyPersistentData == null) {
+      throw new RuntimeConfigurationError(JettyBundle.message(EXCEPTION_TEXT_NO_SAVED_JETTY_CONFIGURATION_STATE));
+    }
+
+    return jettyPersistentData;
+  }
+
+  @NotNull
+  public File[] getActiveConfigFiles() throws RuntimeConfigurationError
+  {
+    final JettyPersistentData jettyPersistentData = getJettyPersistentData();
     final List<JettyPersistentData.JettyConfigurationFile> configFiles =
       jettyPersistentData.getJettyConfigurationFiles();
     final List<JettyPersistentData.JettyConfigurationFile> activeConfigFiles =
@@ -102,15 +123,18 @@ public class JettyModel implements ServerModel
 
   public String getHomeDirectory() throws RuntimeConfigurationException
   {
-    final ApplicationServer applicationServer = commonModel.getApplicationServer();
+    return getJettyPersistentData().getJettyHome().replace('/', File.separatorChar);
+  }
 
-    if (applicationServer == null) {
-      throw new RuntimeConfigurationError(JettyBundle.message(EXCEPTION_TEXT_NO_APPLICATION_SERVER));
+  @Nullable
+  public JettyVersionHelper getJettyVersionHelper() throws JettyException
+  {
+    try {
+      return getJettyPersistentData().getJettyVersionHelper();
     }
-
-    final JettyPersistentData jettyPersistentData = ((JettyPersistentData) applicationServer.getPersistentData());
-
-    return jettyPersistentData.getJettyHome().replace('/', File.separatorChar);
+    catch (RuntimeConfigurationError e) {
+      throw new JettyException(e.getMessage(), e);
+    }
   }
 
   public Project getProject()
@@ -165,18 +189,24 @@ public class JettyModel implements ServerModel
 
   public J2EEServerInstance createServerInstance() throws ExecutionException
   {
-    final JettyServerInstance jettyServerInstance = new JettyServerInstance(commonModel);
+    try {
+      final JettyVersionHelper versionHelper = getJettyVersionHelper();
 
-    if (commonModel.isLocal()) {
-      try {
+      if (versionHelper == null) {
+        throw new ExecutionException("The chosen application server is not configured with a supported version of Jetty");
+      }
+
+      final JettyServerInstance jettyServerInstance = new JettyServerInstance(versionHelper, commonModel);
+
+      if (commonModel.isLocal()) {
         JettyDeploymentProvider.prepareServer(this);
       }
-      catch (JettyException e) {
-        throw new ExecutionException(e.getMessage(), e);
-      }
-    }
 
-    return jettyServerInstance;
+      return jettyServerInstance;
+    }
+    catch (JettyException e) {
+      throw new ExecutionException(e.getMessage(), e);
+    }
   }
 
   public DeploymentProvider getDeploymentProvider()

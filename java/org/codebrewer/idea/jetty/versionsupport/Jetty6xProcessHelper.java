@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, 2008 Mark Scott
+ * Copyright 2010 Mark Scott
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.codebrewer.idea.jetty;
+package org.codebrewer.idea.jetty.versionsupport;
 
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Mark Scott
  * @version $Id$
  */
-public class Jetty6xVersionFileChecker extends AbstractJettyVersionFileChecker
+public class Jetty6xProcessHelper extends AbstractProcessHelper
 {
-  @NonNls private static final String VERSION_FILE_NAME = "VERSION.txt";
-  @NonNls private static final String VERSION_PATTERN = "^jetty-(6\\.1\\.\\d+) .*";
+  @NonNls
+  private static final String START_COMMAND = "-DSTOP.PORT=0 -cp start.jar org.mortbay.start.Main";
 
-  @NotNull public String getVersionFileName()
+  @NonNls
+  private static final String STARTING_MESSAGE = "-DSTOP.KEY=";
+
+  @NotNull
+  @Override
+  public String getStartCommand()
   {
-    return VERSION_FILE_NAME;
+    return START_COMMAND;
   }
 
-  @NotNull public String getVersionPattern()
+  @NotNull
+  @Override
+  public String getStopCommandTemplate()
   {
-    return VERSION_PATTERN;
+    return STOP_COMMAND_TEMPLATE;
+  }
+
+  @Override
+  public boolean isStartingMessage(@Nullable String text)
+  {
+    return text != null && text.startsWith(STARTING_MESSAGE);
   }
 }

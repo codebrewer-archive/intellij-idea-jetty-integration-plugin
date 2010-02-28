@@ -29,6 +29,7 @@ import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.packaging.artifacts.Artifact;
 import com.intellij.packaging.artifacts.ArtifactPointer;
+import org.codebrewer.idea.jetty.versionsupport.JettyVersionHelper;
 import org.jdom.Document;
 import org.jdom.output.XMLOutputter;
 import org.jetbrains.annotations.NonNls;
@@ -48,6 +49,11 @@ import static org.codebrewer.idea.jetty.JettyConstants.JETTY_CONTEXT_DEPLOYER_CO
  */
 public class JettyDeploymentProvider extends DeploymentProvider
 {
+  private static File getArtifactConfigurationFile(ArtifactPointer artifactPointer, File destinationDirectory)
+  {
+    return new File(destinationDirectory, FileUtil.sanitizeFileName(artifactPointer.getArtifactName()) + ".xml");
+  }
+
   private static void setDeploymentStatus(J2EEServerInstance instance,
                                           JettyModuleDeploymentModel model,
                                           DeploymentStatus status)
@@ -65,7 +71,9 @@ public class JettyDeploymentProvider extends DeploymentProvider
     final File scratchDirectory = JettyUtil.getScratchDirectory(project);
     final File contextDeployerDirectory = JettyUtil.getContextDeployerConfigurationDirectory(scratchDirectory);
     final XMLOutputter xmlOutputter = JDOMUtil.createOutputter(System.getProperty("line.separator"));
-    final Document contextDeployerDocument = JettyUtil.getContextDeployerDocument(scratchDirectory);
+    final JettyVersionHelper versionHelper = jettyModel.getJettyVersionHelper();
+    assert versionHelper != null;
+    final Document contextDeployerDocument = JettyUtil.getContextDeployerDocument(versionHelper, scratchDirectory);
 
     FileUtil.delete(scratchDirectory);
     jettyModel.setScratchDirectory(scratchDirectory);
@@ -106,10 +114,12 @@ public class JettyDeploymentProvider extends DeploymentProvider
 
     if (artifactPointer != null) {
       try {
-        final Document moduleDeploymentDocument = JettyUtil.getContextDeploymentDocument(project, moduleDeploymentModel);
         final JettyModel jettyModel = (JettyModel) moduleDeploymentModel.getServerModel();
+        final JettyVersionHelper versionHelper = jettyModel.getJettyVersionHelper();
+        assert versionHelper != null;
+        final Document moduleDeploymentDocument = JettyUtil.getContextDeploymentDocument(project, moduleDeploymentModel, versionHelper);
         final File destinationDirectory = JettyUtil.getContextDeployerConfigurationDirectory(jettyModel.getScratchDirectory());
-        final File artifactConfigurationFile = new File(destinationDirectory, artifactPointer.getArtifactName() + ".xml");
+        final File artifactConfigurationFile = getArtifactConfigurationFile(artifactPointer, destinationDirectory);
         final XMLOutputter xmlOutputter = JDOMUtil.createOutputter(System.getProperty("line.separator"));
 
         OutputStream out = null;
@@ -170,7 +180,7 @@ public class JettyDeploymentProvider extends DeploymentProvider
     if (artifactPointer != null) {
       final JettyModel jettyModel = (JettyModel) moduleDeploymentModel.getServerModel();
       final File configurationDirectory = JettyUtil.getContextDeployerConfigurationDirectory(jettyModel.getScratchDirectory());
-      final File artifactConfigurationFile = new File(configurationDirectory, artifactPointer.getArtifactName() + ".xml");
+      final File artifactConfigurationFile = getArtifactConfigurationFile(artifactPointer, configurationDirectory);
 
       deploymentStatus = artifactConfigurationFile.delete() ? DeploymentStatus.NOT_DEPLOYED : DeploymentStatus.UNKNOWN;
     }
@@ -188,7 +198,7 @@ public class JettyDeploymentProvider extends DeploymentProvider
     if (artifactPointer != null) {
       final JettyModel jettyModel = (JettyModel) moduleDeploymentModel.getServerModel();
       final File configurationDirectory = JettyUtil.getContextDeployerConfigurationDirectory(jettyModel.getScratchDirectory());
-      final File artifactConfigurationFile = new File(configurationDirectory, artifactPointer.getArtifactName() + ".xml");
+      final File artifactConfigurationFile = getArtifactConfigurationFile(artifactPointer, configurationDirectory);
 
       deploymentStatus = artifactConfigurationFile.exists() ? DeploymentStatus.DEPLOYED : DeploymentStatus.NOT_DEPLOYED;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Mark Scott
+ * Copyright 2007, 2010 Mark Scott
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.codebrewer.idea.jetty;
+package org.codebrewer.idea.jetty.versionsupport.extensions;
 
-import org.jetbrains.annotations.NonNls;
+import com.intellij.openapi.extensions.ExtensionPointName;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
 
 /**
  * @author Mark Scott
- * @version $Id$
+ * @version $Id: JettyVersionChecker.java 6 2007-02-10 23:33:18Z mark $
  */
-public class Jetty4x5xVersionFileChecker extends AbstractJettyVersionFileChecker
+public interface JettyVersionChecker
 {
-  @NonNls private static final String VERSION_FILE_NAME = "VERSION.TXT";
-  @NonNls private static final String VERSION_PATTERN = "^Jetty-(.*) - .*";
+  ExtensionPointName<JettyVersionChecker> EXTENSION_POINT_NAME =
+    ExtensionPointName.create("org.codebrewer.idea.jetty.jettyVersionChecker");
 
-  @NotNull public String getVersionFileName()
-  {
-    return VERSION_FILE_NAME;
-  }
-
-  @NotNull public String getVersionPattern()
-  {
-    return VERSION_PATTERN;
-  }
+  @Nullable
+  String getVersionString(@NotNull final File jettyHomeDir);
 }

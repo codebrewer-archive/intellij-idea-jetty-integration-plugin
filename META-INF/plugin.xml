@@ -48,8 +48,34 @@
   </change-notes>
   <idea-version since-build="##IDEA_VERSION_MIN##" until-build="##IDEA_VERSION_MAX##" />
   <resource-bundle>org.codebrewer.idea.jetty.JettyBundle</resource-bundle>
+  <extensionPoints>
+    <extensionPoint qualifiedName="org.codebrewer.idea.jetty.jettyVersionChecker"
+                    interface="org.codebrewer.idea.jetty.versionsupport.extensions.JettyVersionChecker" />
+    <extensionPoint qualifiedName="org.codebrewer.idea.jetty.jettyVersionHelperProvider"
+                    interface="org.codebrewer.idea.jetty.versionsupport.extensions.JettyVersionHelperProvider" />
+  </extensionPoints>
   <extensions defaultExtensionNs="com.intellij">
     <configurationType implementation="org.codebrewer.idea.jetty.JettyRunConfigurationType" />
     <javaee.appServerIntegration implementation="org.codebrewer.idea.jetty.JettyManager" />
+  </extensions>
+  <extensions defaultExtensionNs="org.codebrewer.idea.jetty">
+    <jettyVersionChecker id="1"
+                         order="FIRST"
+                         implementation="org.codebrewer.idea.jetty.versionsupport.JettyStartJarVersionChecker" />
+    <jettyVersionChecker id="2"
+                         order="AFTER 1"
+                         implementation="org.codebrewer.idea.jetty.versionsupport.Hightide6xVersionFileChecker" />
+    <jettyVersionChecker id="3"
+                         order="AFTER 2"
+                         implementation="org.codebrewer.idea.jetty.versionsupport.Jetty6xVersionFileChecker" />
+    <jettyVersionHelperProvider id="1"
+                                order="FIRST"
+                                implementation="org.codebrewer.idea.jetty.versionsupport.JettyVersion7xHelperProvider" />
+    <jettyVersionHelperProvider id="2"
+                                order="AFTER 1"
+                                implementation="org.codebrewer.idea.jetty.versionsupport.JettyVersion6xHelperProvider" />
+    <jettyVersionHelperProvider id="3"
+                                order="AFTER 2"
+                                implementation="org.codebrewer.idea.jetty.versionsupport.HightideVersion6xHelperProvider" />
   </extensions>
 </idea-plugin>

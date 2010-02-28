@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.codebrewer.idea.jetty;
+package org.codebrewer.idea.jetty.versionsupport;
 
+import org.codebrewer.idea.jetty.versionsupport.extensions.JettyVersionChecker;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -39,7 +40,7 @@ public class JettyStartJarVersionChecker implements JettyVersionChecker
   public static final String START_JAR_FILE_NAME = "start.jar";
 
   @Override
-  public String getVersion(@NotNull String jettyHomeDir)
+  public String getVersionString(@NotNull File jettyHomeDir)
   {
     String version = null;
     final File startFile = new File(jettyHomeDir, START_JAR_FILE_NAME);

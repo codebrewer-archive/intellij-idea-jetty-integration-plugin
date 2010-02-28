@@ -26,22 +26,22 @@ import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.EnvironmentUtil;
+import org.codebrewer.idea.jetty.versionsupport.ConfigurationFileHelper;
+import org.codebrewer.idea.jetty.versionsupport.JettyVersionHelper;
 import org.jdom.DocType;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
 
+import static org.codebrewer.idea.jetty.versionsupport.ConfigurationFileHelper.JETTY_DOCTYPE_ELEMENT_NAME;
 import static org.codebrewer.idea.jetty.JettyConstants.DEFAULT_PORT;
 import static org.codebrewer.idea.jetty.JettyConstants.JETTY_CONFIG_DIRECTORY_NAME;
 import static org.codebrewer.idea.jetty.JettyConstants.JETTY_CONTEXT_DEPLOYER_CONFIG_DIR_NAME;
-import static org.codebrewer.idea.jetty.JettyConstants.JETTY_DOCTYPE_ELEMENT_NAME;
-import static org.codebrewer.idea.jetty.JettyConstants.JETTY_DOCTYPE_PUBLIC_ID;
-import static org.codebrewer.idea.jetty.JettyConstants.JETTY_DOCTYPE_SYSTEM_ID;
 import static org.codebrewer.idea.jetty.JettyConstants.JETTY_HOME_ENV_VAR;
 
 /**
@@ -51,15 +51,14 @@ import static org.codebrewer.idea.jetty.JettyConstants.JETTY_HOME_ENV_VAR;
  */
 public class JettyUtil
 {
-  private static final JettyVersionChecker[] JETTY_VERSION_CHECKERS = new JettyVersionChecker[]{
-    new JettyStartJarVersionChecker(),
-    new Hightide6xVersionFileChecker(),
-    new Jetty6xVersionFileChecker(),
-    new Jetty4x5xVersionFileChecker() };
-  private static final String EXCEPTION_TEXT_CANNOT_LOAD_FILE = "exception.text.cannot.load.file.bacause.of.1";
-
+  @NonNls
   private static final String EMPTY_STRING = "";
+
+  @NonNls
   private static final String SCRATCH_DIRECTORY_NAME_PREFIX = "jetty_";
+
+  @NonNls
+  public static final String EXCEPTION_TEXT_CANNOT_LOAD_FILE = "exception.text.cannot.load.file.bacause.of.1";
 
   public static String baseConfigDir(final String baseDirectoryPath)
   {
@@ -67,9 +66,9 @@ public class JettyUtil
   }
 
   @NotNull
-  public static Document getContextDeployerDocument(@NotNull final File scratchDirectory)
+  public static Document getContextDeployerDocument(@NotNull JettyVersionHelper versionHelper,
+                                                    @NotNull final File scratchDirectory) throws JettyException
   {
-    final DocType docType = new DocType(JETTY_DOCTYPE_ELEMENT_NAME, JETTY_DOCTYPE_PUBLIC_ID, JETTY_DOCTYPE_SYSTEM_ID);
     final Element rootElement = new Element(JETTY_DOCTYPE_ELEMENT_NAME);
     final Element callElement = new Element("Call");
     final Element argElement = new Element("Arg");
@@ -78,11 +77,15 @@ public class JettyUtil
     final Element refElement = new Element("Ref");
     final Element setConfigurationDirElement = new Element("Set");
     final Element setScanIntervalElement = new Element("Set");
+    final ConfigurationFileHelper configurationFileHelper = versionHelper.getConfigurationFileHelper();
+    final DocType docType = new DocType(JETTY_DOCTYPE_ELEMENT_NAME,
+      configurationFileHelper.getDoctypePublicId(),
+      configurationFileHelper.getDoctypeSystemId());
 
     rootElement.setAttribute("id", "Server"); // Todo - this is a reference to an element defined in an active config file so shouldn't be hard-coded
-    rootElement.setAttribute("class", "org.mortbay.jetty.Server");
+    rootElement.setAttribute("class", configurationFileHelper.getFullyQualifiedClassName("Server"));
     callElement.setAttribute("name", "addLifeCycle");
-    newElement.setAttribute("class", "org.mortbay.jetty.deployer.ContextDeployer");
+    newElement.setAttribute("class", configurationFileHelper.getFullyQualifiedClassName("ContextDeployer"));
     setContextsElement.setAttribute("name", "contexts");
     refElement.setAttribute("id", "Contexts"); // Todo - this is a reference to an element defined in an active config file so shouldn't be hard-coded
     setConfigurationDirElement.setAttribute("name", "configurationDir");
@@ -103,8 +106,9 @@ public class JettyUtil
   }
 
   @NotNull
-  public static Document getContextDeploymentDocument(
-    @NotNull final Project project, @NotNull final JettyModuleDeploymentModel model) throws JettyException
+  public static Document getContextDeploymentDocument(@NotNull final Project project,
+                                                      @NotNull final JettyModuleDeploymentModel model,
+                                                      @NotNull JettyVersionHelper versionHelper) throws JettyException
   {
     final DeploymentManager deploymentManager = DeploymentManager.getInstance(project);
     final File deploymentSource = deploymentManager.getDeploymentSource(model);     // full path to war file or exploded directory
@@ -115,12 +119,13 @@ public class JettyUtil
 
     final DeploymentSource deploymentMethod = model.getDeploymentSource(); // DeploymentSource.FROM_JAR or DeploymentSource.FROM_EXPLODED
     final String contextPath = model.getContextPath();
-    final DocType docType = new DocType(JETTY_DOCTYPE_ELEMENT_NAME, JETTY_DOCTYPE_PUBLIC_ID, JETTY_DOCTYPE_SYSTEM_ID);
+    final ConfigurationFileHelper configurationFileHelper = versionHelper.getConfigurationFileHelper();
+    final DocType docType = new DocType(JETTY_DOCTYPE_ELEMENT_NAME, configurationFileHelper.getDoctypePublicId(), configurationFileHelper.getDoctypeSystemId());
     final Element rootElement = new Element(JETTY_DOCTYPE_ELEMENT_NAME);
     final Element setContextPathElement = new Element("Set");
     final Element setDeploymentSourceElement = new Element("Set");
 
-    rootElement.setAttribute("class", "org.mortbay.jetty.webapp.WebAppContext");
+    rootElement.setAttribute("class", configurationFileHelper.getFullyQualifiedClassName("WebAppContext"));
     setContextPathElement.setAttribute("name", "contextPath");
     setContextPathElement.setText(contextPath);
 
@@ -137,7 +142,6 @@ public class JettyUtil
     rootElement.addContent(setDeploymentSourceElement);
 
     final Document result = new Document(rootElement, docType);
-
     return result;
   }
 
@@ -198,38 +202,26 @@ public class JettyUtil
     });
   }
 
-  @Nullable
-  public static String getVersion(final String homeDir)
-  {
-    for (final JettyVersionChecker jettyVersionChecker : JETTY_VERSION_CHECKERS) {
-      final String jettyVersion = jettyVersionChecker.getVersion(homeDir);
-
-      if (jettyVersion != null) {
-        return jettyVersion;
-      }
-    }
-
-    return null;
-  }
-
-  public static boolean isJettyConfigurationFile(final String path)
+  public static boolean isJettyConfigurationFile(JettyVersionHelper versionHelper, final String path)
   {
     boolean result = false;
 
-    try {
-      final Document document = loadXMLFile(path);
-      final DocType docType = document.getDocType();
+    if (versionHelper != null) {
+      try {
+        final Document document = loadXMLFile(path);
+        final DocType docType = document.getDocType();
 
-      if (docType != null) {
-        final boolean isValidElementName = JETTY_DOCTYPE_ELEMENT_NAME.equals(docType.getElementName());
-        final boolean isValidPublicID = JETTY_DOCTYPE_PUBLIC_ID.equals(docType.getPublicID());
-        final boolean isValidSystemID = JETTY_DOCTYPE_SYSTEM_ID.equals(docType.getSystemID());
+        if (docType != null) {
+          final boolean isValidElementName = JETTY_DOCTYPE_ELEMENT_NAME.equals(docType.getElementName());
+          final boolean isValidPublicID = versionHelper.getConfigurationFileHelper().getDoctypePublicId().equals(docType.getPublicID());
+          final boolean isValidSystemID = versionHelper.getConfigurationFileHelper().getDoctypeSystemId().equals(docType.getSystemID());
 
-        result = isValidElementName && isValidPublicID && isValidSystemID;
+          result = isValidElementName && isValidPublicID && isValidSystemID;
+        }
       }
-    }
-    catch (JettyException ignore) {
-      result = false;
+      catch (JettyException ignore) {
+        result = false;
+      }
     }
 
     return result;
@@ -254,27 +246,5 @@ public class JettyUtil
   private JettyUtil()
   {
     // Utility class
-  }
-
-  public static class ContextItem
-  {
-    private File myFile;
-    private Element myElement;
-
-    public ContextItem(final File file, final Element element)
-    {
-      myFile = file;
-      myElement = element;
-    }
-
-    public File getFile()
-    {
-      return myFile;
-    }
-
-    public Element getElement()
-    {
-      return myElement;
-    }
   }
 }

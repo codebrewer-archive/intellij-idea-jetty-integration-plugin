@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, 2008 Mark Scott
+ * Copyright 2007, 2008, 2010 Mark Scott, Chris Miller
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,16 @@ import com.intellij.ui.DocumentAdapter;
 import org.codebrewer.idea.jetty.components.ConfigurationFileJTable;
 import org.codebrewer.idea.jetty.components.ConfigurationFileTableModel;
 import org.codebrewer.idea.jetty.components.TableWithARUMButtons;
+import org.codebrewer.idea.jetty.versionsupport.JettyVersionHelper;
+import org.codebrewer.idea.jetty.versionsupport.JettyVersionHelperFactory;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JViewport;
+import javax.swing.event.DocumentEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -44,48 +52,34 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JViewport;
-import javax.swing.event.DocumentEvent;
-
 /**
  * @author Mark Scott
+ * @author Chris Miller
  * @version $Id$
  */
 public class JettyDataEditor extends ApplicationServerPersistentDataEditor<JettyPersistentData>
 {
-  public static FileChooserDescriptor JETTY_CONFIGURATION_FILE_CHOOSER_DESCRIPTOR =
-      new FileChooserDescriptor(true, false, false, false, false, false)
-      {
-        public boolean isFileVisible(final VirtualFile file, final boolean showHiddenFiles)
-        {
-          boolean result = super.isFileVisible(file, showHiddenFiles);
+  private static class JettyConfigurationFileChooserDescriptor extends FileChooserDescriptor
+  {
+    private final JettyVersionHelper versionHelper;
 
-          if (!file.isDirectory()) {
-            result &= JettyUtil.isJettyConfigurationFile(file.getPath());
-          }
+    private JettyConfigurationFileChooserDescriptor(JettyVersionHelper versionHelper, boolean chooseMultiple)
+    {
+      super(true, false, false, false, false, chooseMultiple);
+      this.versionHelper = versionHelper;
+    }
 
-          return result;
-        }
-      };
+    public boolean isFileVisible(final VirtualFile file, final boolean showHiddenFiles)
+    {
+      boolean result = super.isFileVisible(file, showHiddenFiles);
 
-  public static FileChooserDescriptor JETTY_CONFIGURATION_FILES_CHOOSER_DESCRIPTOR =
-      new FileChooserDescriptor(true, false, false, false, false, true)
-      {
-        public boolean isFileVisible(final VirtualFile file, final boolean showHiddenFiles)
-        {
-          boolean result = super.isFileVisible(file, showHiddenFiles);
+      if (!file.isDirectory()) {
+        result &= JettyUtil.isJettyConfigurationFile(versionHelper, file.getPath());
+      }
 
-          if (!file.isDirectory()) {
-            result &= JettyUtil.isJettyConfigurationFile(file.getPath());
-          }
-
-          return result;
-        }
-      };
+      return result;
+    }
+  }
 
   private static void checkIsDirectory(final File file) throws ConfigurationException
   {
@@ -110,6 +104,11 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
   private final JLabel jettyVersionLabel;
 
   /**
+   * The major Jetty version currently being edited
+   */
+  private JettyVersionHelper versionHelper;
+
+  /**
    * Used to manage the configuration files to be used with the Jetty installation.
    */
   private final ServerConfigurationFileTable jettyConfigurationFileTable;
@@ -120,6 +119,7 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
     jettyHomeField = new TextFieldWithBrowseButton();
     jettyVersionLabel = new JLabel();
     jettyConfigurationFileTable = new ServerConfigurationFileTable();
+    versionHelper = null;
     build();
   }
 
@@ -135,8 +135,8 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
     final JLabel jettyHomeFieldLabel = new JLabel(JettyBundle.message("label.configuration.jetty.home"));
     jettyHomeFieldLabel.setLabelFor(jettyHomeField);
     northPanel.add(jettyHomeFieldLabel,
-        new GridBagConstraints(
-            0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.NONE, insets, 0, 0));
+      new GridBagConstraints(
+        0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.NONE, insets, 0, 0));
 
     // Widget for choosing the Jetty installation directory
     //
@@ -144,9 +144,9 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
     jettyHomeField.setText(JettyUtil.getDefaultLocation());
     jettyHomeField.getTextField().setEditable(true);
     jettyHomeField.addBrowseFolderListener(JettyBundle.message("chooser.title.jetty.home.directory"),
-        JettyBundle.message("chooser.description.jetty.home.directory"),
-        null,
-        new FileChooserDescriptor(false, true, false, false, false, false));
+      JettyBundle.message("chooser.description.jetty.home.directory"),
+      null,
+      new FileChooserDescriptor(false, true, false, false, false, false));
     jettyHomeField.getTextField().getDocument().addDocumentListener(new DocumentAdapter()
     {
       public void textChanged(final DocumentEvent event)
@@ -155,21 +155,21 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
       }
     });
     northPanel.add(jettyHomeField,
-        new GridBagConstraints(
-            1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.NONE, insets, 0, 0));
+      new GridBagConstraints(
+        1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.NONE, insets, 0, 0));
 
     // Label for the Jetty version label
     //
     final JLabel jettyVersionLabelLabel = new JLabel(JettyBundle.message("label.configuration.detected.jetty.version"));
     northPanel.add(jettyVersionLabelLabel,
-        new GridBagConstraints(
-            0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.NONE, insets, 0, 0));
+      new GridBagConstraints(
+        0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.NONE, insets, 0, 0));
 
     // Label for displaying the Jetty version detected from the installation
     //
     northPanel.add(jettyVersionLabel,
-        new GridBagConstraints(
-            1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.NONE, insets, 0, 0));
+      new GridBagConstraints(
+        1, 1, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.NONE, insets, 0, 0));
 
     panel.add(northPanel, BorderLayout.NORTH);
     panel.add(jettyConfigurationFileTable.getComponent(), BorderLayout.CENTER);
@@ -180,25 +180,19 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
     final String homeDir = jettyHomeField.getText();
 
     if (homeDir.length() > 0) {
-      final String jettyVersion = JettyUtil.getVersion(homeDir);
+      versionHelper = JettyVersionHelperFactory.INSTANCE.getJettyVersionHelper(new File(homeDir));
 
-      if (jettyVersion == null) {
-        jettyVersionLabel.setText(JettyBundle.message("message.text.jetty.not.found"));
+      if (versionHelper == null) {
+        jettyVersionLabel.setText(JettyBundle.message("message.text.no.supported.version.of.jetty.found"));
         jettyVersionLabel.setForeground(Color.RED);
-//        clearConfigurationFileTable();
       }
-      else if (jettyVersion.startsWith("6.1")) {
-        jettyVersionLabel.setText(jettyVersion);
+      else {
+        jettyVersionLabel.setText(versionHelper.getVersionString());
         jettyVersionLabel.setForeground(Color.BLACK);
 
         if (updateConfigFiles) {
-          fillConfigurationFileTable(JettyUtil.baseConfigDir(homeDir));
+          fillConfigurationFileTable(versionHelper, JettyUtil.baseConfigDir(homeDir));
         }
-      }
-      else {
-        jettyVersionLabel.setText(jettyVersion);
-        jettyVersionLabel.setForeground(Color.RED);
-//        clearConfigurationFileTable();
       }
     }
     else {
@@ -214,7 +208,7 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
 //    model.removeConfigurationFiles();
 //  }
 
-  private void fillConfigurationFileTable(final String configDirPath)
+  private void fillConfigurationFileTable(final JettyVersionHelper versionHelper, final String configDirPath)
   {
     final File configDir = new File(configDirPath);
 
@@ -223,20 +217,20 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
       {
         public boolean accept(final File dir, final String name)
         {
-          return JettyUtil.isJettyConfigurationFile(new File(dir, name).getAbsolutePath());
+          return JettyUtil.isJettyConfigurationFile(versionHelper, new File(dir, name).getAbsolutePath());
         }
       });
 
       if (configFiles != null && configFiles.length > 0) {
         final List<JettyPersistentData.JettyConfigurationFile> configFilesList =
-            new ArrayList<JettyPersistentData.JettyConfigurationFile>(configFiles.length);
+          new ArrayList<JettyPersistentData.JettyConfigurationFile>(configFiles.length);
 
         for (final String configFile : configFiles) {
           final String configFilePath = new File(configDirPath, configFile).getAbsolutePath();
 
           try {
             configFilesList.add(new JettyPersistentData.JettyConfigurationFile(
-              configFilePath, JettyConstants.JETTY_XML_FILE_NAME.equals(configFile)));
+              versionHelper, configFilePath, JettyConstants.JETTY_XML_FILE_NAME.equals(configFile)));
           }
           catch (ConfigurationException e) {
             // Shouldn't happen unless the file changes on disk in a small time window...
@@ -246,7 +240,7 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
         Collections.sort(configFilesList, new Comparator<JettyPersistentData.JettyConfigurationFile>()
         {
           public int compare(
-              final JettyPersistentData.JettyConfigurationFile o1, final JettyPersistentData.JettyConfigurationFile o2)
+            final JettyPersistentData.JettyConfigurationFile o1, final JettyPersistentData.JettyConfigurationFile o2)
           {
             if (JettyConstants.JETTY_XML_FILE_NAME.equals(o1.getFile().getName())) {
               return -1;
@@ -273,7 +267,7 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
     checkIsDirectory(new File(home, JettyConstants.JETTY_LIB_DIRECTORY_NAME));
 
     s.setJettyHome(home.getAbsolutePath().replace(File.separatorChar, '/'));
-    s.setJettyVersion(jettyVersionLabel.getText());
+    s.setJettyVersionHelper(versionHelper);
     s.setJettyConfigurationFiles(jettyConfigurationFileTable.getConfigurationFiles());
   }
 
@@ -303,9 +297,9 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
     {
       super(new ConfigurationFileJTable(), null);
       getComponent().setBorder(BorderFactory.createCompoundBorder(
-          BorderFactory.createEmptyBorder(5, 0, 0, 0),
-          BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
-              JettyBundle.message("data.editor.configuration.files.title"))));
+        BorderFactory.createEmptyBorder(5, 0, 0, 0),
+        BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
+          JettyBundle.message("data.editor.configuration.files.title"))));
     }
 
     protected void ensureRowVisible(final int row)
@@ -320,7 +314,8 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
       }
     }
 
-    protected @NotNull List<JettyPersistentData.JettyConfigurationFile> getConfigurationFiles()
+    @NotNull
+    protected List<JettyPersistentData.JettyConfigurationFile> getConfigurationFiles()
     {
       final ConfigurationFileTableModel model = (ConfigurationFileTableModel) table.getModel();
       final List<JettyPersistentData.JettyConfigurationFile> result = model.getConfigurationFiles();
@@ -329,7 +324,7 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
     }
 
     protected void setConfigurationFiles(
-        @NotNull final List<JettyPersistentData.JettyConfigurationFile> configurationFiles)
+      @NotNull final List<JettyPersistentData.JettyConfigurationFile> configurationFiles)
     {
       final ConfigurationFileTableModel model = (ConfigurationFileTableModel) table.getModel();
       model.removeConfigurationFiles();
@@ -341,8 +336,8 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
 
     protected void doAdd()
     {
-      final FileChooserDialog fileChooserDialog =
-          FileChooserFactory.getInstance().createFileChooser(JETTY_CONFIGURATION_FILES_CHOOSER_DESCRIPTOR, project);
+      final FileChooserDialog fileChooserDialog = FileChooserFactory.getInstance().createFileChooser(
+        new JettyConfigurationFileChooserDescriptor(versionHelper, true), project);
       final VirtualFile initialSelection;
 
       if (chosenFiles != null && chosenFiles.length > 0) {
@@ -350,8 +345,8 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
       }
       else if (jettyHomeField.getText().length() > 0) {
         initialSelection = VirtualFileManager.getInstance().findFileByUrl(
-            JettyConstants.FILE_SCHEME +
-                JettyUtil.baseConfigDir(jettyHomeField.getText()).replace(File.separatorChar, '/'));
+          JettyConstants.FILE_SCHEME +
+            JettyUtil.baseConfigDir(jettyHomeField.getText()).replace(File.separatorChar, '/'));
       }
       else {
         initialSelection = null;
@@ -368,7 +363,7 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
           path = chosenFile.getPath();
 
           try {
-            file = new JettyPersistentData.JettyConfigurationFile(path, true);
+            file = new JettyPersistentData.JettyConfigurationFile(versionHelper, path, true);
             model.addConfigurationFile(file);
           }
           catch (ConfigurationException e) {
@@ -445,10 +440,10 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
       final int selectedRow = table.getSelectedRow();
       final String configurationFilePath = (String) table.getValueAt(selectedRow, 0);
       final VirtualFile initialSelection =
-          VirtualFileManager.getInstance().findFileByUrl(
-              JettyConstants.FILE_SCHEME + configurationFilePath.replace(File.separatorChar, '/'));
-      final FileChooserDialog fileChooserDialog =
-          FileChooserFactory.getInstance().createFileChooser(JETTY_CONFIGURATION_FILE_CHOOSER_DESCRIPTOR, project);
+        VirtualFileManager.getInstance().findFileByUrl(
+          JettyConstants.FILE_SCHEME + configurationFilePath.replace(File.separatorChar, '/'));
+      final FileChooserDialog fileChooserDialog = FileChooserFactory.getInstance().createFileChooser(
+        new JettyConfigurationFileChooserDescriptor(versionHelper, false), project);
       final VirtualFile[] chosenFile = fileChooserDialog.choose(initialSelection, project);
 
       if (chosenFile.length == 1) {
@@ -457,7 +452,7 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
 
         try {
           final JettyPersistentData.JettyConfigurationFile file =
-              new JettyPersistentData.JettyConfigurationFile(path, true);
+            new JettyPersistentData.JettyConfigurationFile(versionHelper, path, true);
           model.setValueAt(file.getFile().getAbsolutePath(), selectedRow, 0);
         }
         catch (ConfigurationException e) {

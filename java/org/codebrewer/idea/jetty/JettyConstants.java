@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, 2008 Mark Scott
+ * Copyright 2007, 2008, 2010 Mark Scott, Chris Miller
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NonNls;
 
 /**
  * @author Mark Scott
+ * @author Chris Miller
  * @version $Id$
  */
 public class JettyConstants
@@ -45,13 +46,6 @@ public class JettyConstants
   public static final String JETTY_OPTS_ENV_VAR = "JETTY_OPTS";
 
   /**
-   * The name of the Jetty JSP 2.1 lib directory, relative to the Jetty
-   * installation lib directory.
-   */
-  @NonNls
-  public static final String JETTY_JSP_2_1_LIB_DIRECTORY_NAME = "jsp-2.1";
-
-  /**
    * The name of the Jetty lib directory, relative to the Jetty installation
    * directory.
    */
@@ -75,24 +69,6 @@ public class JettyConstants
    */
   @NonNls
   public static final String HTTP_SCHEME = "http://";
-
-  /**
-   * The name of the root element in a valid Jetty XML configuration file.
-   */
-  @NonNls
-  public static final String JETTY_DOCTYPE_ELEMENT_NAME = "Configure";
-
-  /**
-   * The public ID of the DOCTYPE declaration in a valid Jetty XML configuration file.
-   */
-  @NonNls
-  public static final String JETTY_DOCTYPE_PUBLIC_ID = "-//Mort Bay Consulting//DTD Configure//EN";
-
-  /**
-   * The system ID of the DOCTYPE declaration in a valid Jetty XML configuration file.
-   */
-  @NonNls
-  public static final String JETTY_DOCTYPE_SYSTEM_ID = "http://jetty.mortbay.org/configure.dtd";
 
   /**
    * The name of the Jetty configuration file dynamically created to define a 'hot' context deployer for use by IDEA.
