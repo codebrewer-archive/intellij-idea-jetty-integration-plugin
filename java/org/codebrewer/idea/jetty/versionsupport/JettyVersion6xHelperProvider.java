@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 
 /**
  * <p>
- * Provider of a helper that handles Jetty 6.x.
+ * Provider of a helper that handles Jetty 6.1.x.
  * </p>
  *
  * @author Mark Scott
@@ -42,7 +42,7 @@ public class JettyVersion6xHelperProvider implements JettyVersionHelperProvider
   public static class JettyVersion6xHelper extends AbstractJettyVersionHelper
   {
     @NonNls
-    private static final Pattern VERSION_PATTERN = Pattern.compile("^6\\..*");
+    private static final Pattern VERSION_PATTERN = Pattern.compile("^6\\.1\\.\\d+");
 
     public JettyVersion6xHelper(@NotNull String versionString) throws JettyException
     {
