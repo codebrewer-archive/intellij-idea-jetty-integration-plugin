@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Mark Scott
- * @version $Id: Jetty6xVersionFileChecker.java 52 2008-11-13 23:49:29Z mark $
+ * @version $Id$
  */
 public class Jetty6xVersionFileChecker extends AbstractJettyVersionFileChecker
 {

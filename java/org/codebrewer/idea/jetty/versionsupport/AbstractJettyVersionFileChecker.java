@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 
 /**
  * @author Mark Scott
- * @version $Id: AbstractJettyVersionFileChecker.java 6 2007-02-10 23:33:18Z mark $
+ * @version $Id$
  */
 public abstract class AbstractJettyVersionFileChecker implements JettyVersionChecker
 {

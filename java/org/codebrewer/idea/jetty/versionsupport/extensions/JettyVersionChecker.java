@@ -23,7 +23,7 @@ import java.io.File;
 
 /**
  * @author Mark Scott
- * @version $Id: JettyVersionChecker.java 6 2007-02-10 23:33:18Z mark $
+ * @version $Id$
  */
 public interface JettyVersionChecker
 {
