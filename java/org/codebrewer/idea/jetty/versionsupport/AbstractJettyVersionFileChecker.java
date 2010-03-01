@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Mark Scott
+ * Copyright 2007, 2010 Mark Scott
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.codebrewer.idea.jetty;
+package org.codebrewer.idea.jetty.versionsupport;
 
+import org.codebrewer.idea.jetty.versionsupport.extensions.JettyVersionChecker;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,10 +36,9 @@ public abstract class AbstractJettyVersionFileChecker implements JettyVersionChe
   @NotNull public abstract String getVersionFileName();
   @NotNull public abstract String getVersionPattern();
 
-  @Nullable public String getVersion(@NotNull final String jettyHomeDir)
+  @Nullable public String getVersionString(@NotNull final File jettyHomeDir)
   {
-    final String pathToVersionFile = jettyHomeDir + File.separator + getVersionFileName();
-    final File versionFile = new File(pathToVersionFile);
+    final File versionFile = new File(jettyHomeDir, getVersionFileName());
 
     if (versionFile.exists() && versionFile.isFile() && versionFile.canRead()) {
       BufferedReader br = null;

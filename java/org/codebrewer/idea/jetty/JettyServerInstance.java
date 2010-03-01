@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, 2008 Mark Scott
+ * Copyright 2007, 2008, 2010 Mark Scott
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,8 @@ import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.javaee.serverInstances.DefaultJ2EEServerEvent;
 import com.intellij.javaee.serverInstances.DefaultServerInstance;
 import com.intellij.openapi.util.Key;
-import org.jetbrains.annotations.NonNls;
+import org.codebrewer.idea.jetty.versionsupport.JettyVersionHelper;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Mark Scott
@@ -36,19 +37,14 @@ import org.jetbrains.annotations.NonNls;
  */
 public class JettyServerInstance extends DefaultServerInstance
 {
-  @NonNls
-  protected static final String STARTING_MESSAGE = "-DSTOP.KEY=";
-
-  private static boolean isStartingMessage(final String text)
-  {
-    return text.startsWith(STARTING_MESSAGE);
-  }
-
+  private final JettyVersionHelper versionHelper;
   private boolean isStartedUp = false;
 
-  public JettyServerInstance(final CommonModel runConfiguration)
+  public JettyServerInstance(@NotNull final JettyVersionHelper versionHelper,
+                             @NotNull final CommonModel runConfiguration)
   {
     super(runConfiguration);
+    this.versionHelper = versionHelper;
   }
 
   @Override
@@ -80,7 +76,7 @@ public class JettyServerInstance extends DefaultServerInstance
     if (getCommonModel().isLocal()) {
       processHandler.addProcessListener(new ProcessAdapter()
       {
-        private int stdoutLinesRead = 0;
+        private int stdoutLinesRead;
 
         @Override
         public void onTextAvailable(final ProcessEvent event, final Key outputType)
@@ -100,7 +96,9 @@ public class JettyServerInstance extends DefaultServerInstance
             }
           }
 
-          if (!isStartedUp && ProcessOutputTypes.STDOUT.equals(outputType) && isStartingMessage(text)) {
+          if (!isStartedUp &&
+            ProcessOutputTypes.STDOUT.equals(outputType) &&
+            versionHelper.getProcessHelper().isStartingMessage(text)) {
             isStartedUp = true;
           }
         }

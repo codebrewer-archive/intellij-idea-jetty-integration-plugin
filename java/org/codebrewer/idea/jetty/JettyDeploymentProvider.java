@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Mark Scott
+ * Copyright 2007, 2010 Mark Scott
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.util.io.FileUtil;
-import static org.codebrewer.idea.jetty.JettyConstants.JETTY_CONTEXT_DEPLOYER_CONFIG_FILE_NAME;
+import org.codebrewer.idea.jetty.versionsupport.JettyVersionHelper;
 import org.jdom.Document;
 import org.jdom.output.XMLOutputter;
 import org.jetbrains.annotations.NonNls;
@@ -40,12 +40,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import static org.codebrewer.idea.jetty.JettyConstants.JETTY_CONTEXT_DEPLOYER_CONFIG_FILE_NAME;
+
 /**
  * @author Mark Scott
  * @version $Id$
  */
 public class JettyDeploymentProvider implements DeploymentProvider
 {
+  private static File getFacetConfigurationFile(JavaeeFacet facet, File destinationDirectory)
+  {
+    return new File(destinationDirectory, FileUtil.sanitizeFileName(facet.getName()) + ".xml");
+  }
+
   private static void setDeploymentStatus(J2EEServerInstance instance,
                                           JettyModuleDeploymentModel model,
                                           DeploymentStatus status)
@@ -64,7 +71,9 @@ public class JettyDeploymentProvider implements DeploymentProvider
     final File scratchDirectory = JettyUtil.getScratchDirectory(project);
     final File contextDeployerDirectory = JettyUtil.getContextDeployerConfigurationDirectory(scratchDirectory);
     final XMLOutputter xmlOutputter = JDOMUtil.createOutputter(System.getProperty("line.separator"));
-    final Document contextDeployerDocument = JettyUtil.getContextDeployerDocument(scratchDirectory);
+    final JettyVersionHelper versionHelper = jettyModel.getJettyVersionHelper();
+    assert versionHelper != null;
+    final Document contextDeployerDocument = JettyUtil.getContextDeployerDocument(versionHelper, scratchDirectory);
 
     FileUtil.delete(scratchDirectory);
     jettyModel.setScratchDirectory(scratchDirectory);
@@ -105,10 +114,12 @@ public class JettyDeploymentProvider implements DeploymentProvider
 
     if (facet != null) {
       try {
-        final Document moduleDeploymentDocument = JettyUtil.getContextDeploymentDocument(project, moduleDeploymentModel);
         final JettyModel jettyModel = (JettyModel) moduleDeploymentModel.getServerModel();
+        final JettyVersionHelper versionHelper = jettyModel.getJettyVersionHelper();
+        assert versionHelper != null;
+        final Document moduleDeploymentDocument = JettyUtil.getContextDeploymentDocument(project, moduleDeploymentModel, versionHelper);
         final File destinationDirectory = JettyUtil.getContextDeployerConfigurationDirectory(jettyModel.getScratchDirectory());
-        final File facetConfigurationFile = new File(destinationDirectory, facet.getName() + ".xml");
+        final File facetConfigurationFile = getFacetConfigurationFile(facet, destinationDirectory);
         final XMLOutputter xmlOutputter = JDOMUtil.createOutputter(System.getProperty("line.separator"));
 
         OutputStream out = null;
@@ -170,7 +181,7 @@ public class JettyDeploymentProvider implements DeploymentProvider
     if (facet != null) {
       final JettyModel jettyModel = (JettyModel) moduleDeploymentModel.getServerModel();
       final File configurationDirectory = JettyUtil.getContextDeployerConfigurationDirectory(jettyModel.getScratchDirectory());
-      final File facetConfigurationFile = new File(configurationDirectory, facet.getName() + ".xml");
+      final File facetConfigurationFile = getFacetConfigurationFile(facet, configurationDirectory);
 
       deploymentStatus = facetConfigurationFile.delete() ? DeploymentStatus.NOT_DEPLOYED : DeploymentStatus.UNKNOWN;
     }
@@ -188,7 +199,7 @@ public class JettyDeploymentProvider implements DeploymentProvider
     if (facet != null) {
       final JettyModel jettyModel = (JettyModel) moduleDeploymentModel.getServerModel();
       final File configurationDirectory = JettyUtil.getContextDeployerConfigurationDirectory(jettyModel.getScratchDirectory());
-      final File facetConfigurationFile = new File(configurationDirectory, facet.getName() + ".xml");
+      final File facetConfigurationFile = getFacetConfigurationFile(facet, configurationDirectory);
 
       deploymentStatus = facetConfigurationFile.exists() ? DeploymentStatus.DEPLOYED : DeploymentStatus.NOT_DEPLOYED;
     }

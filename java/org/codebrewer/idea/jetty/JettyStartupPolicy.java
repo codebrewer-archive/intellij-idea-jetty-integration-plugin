@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, 2008 Mark Scott
+ * Copyright 2007, 2008, 2010 Mark Scott
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,8 @@ import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.util.EnvironmentUtil;
-import static org.codebrewer.idea.jetty.JettyConstants.JETTY_CONTEXT_DEPLOYER_CONFIG_FILE_NAME;
+import org.codebrewer.idea.jetty.versionsupport.JettyVersionHelper;
+import org.codebrewer.idea.jetty.versionsupport.ProcessHelper;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,6 +42,9 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.codebrewer.idea.jetty.JettyConstants.JETTY_CONTEXT_DEPLOYER_CONFIG_FILE_NAME;
+import static org.codebrewer.idea.jetty.JettyConstants.JETTY_OPTS_ENV_VAR;
 
 /**
  * @author Mark Scott
@@ -54,10 +58,6 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
   private static final String JAVA_HOME_ENV_PROPERTY = "JAVA_HOME";
   @NonNls
   private static final String JAVA_VM_ENV_VARIABLE = "JAVA_OPTS";
-  @NonNls
-  private static final String JETTY_STOP_COMMAND_TEMPLATE = "-DSTOP.PORT={0,number,#####} -DSTOP.KEY={1} -jar start.jar --stop";
-  @NonNls
-  private static final String JETTY_START_COMMAND = "-DSTOP.PORT=0 -cp start.jar org.mortbay.start.Main";
   @NonNls
   private static final String DOUBLE_QUOTE_STRING = "\"";
   @NonNls
@@ -195,24 +195,31 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
           final JettyModel jettyModel = (JettyModel) model.getServerModel();
           vars.add(new EnvironmentVariable(JettyConstants.JETTY_HOME_ENV_VAR, jettyModel.getHomeDirectory(), true));
           final int stopPort = jettyModel.getStopPort();
+          final JettyVersionHelper versionHelper = jettyModel.getJettyVersionHelper();
+          assert versionHelper != null;
+          final ProcessHelper processHelper = versionHelper.getProcessHelper();
 
           // If the stop port is zero then the call is for the startup helper
           //
           if (stopPort == 0) {
-            vars.add(new EnvironmentVariable(JettyConstants.JETTY_OPTS_ENV_VAR, JETTY_START_COMMAND, true));
+            vars.add(new EnvironmentVariable(JETTY_OPTS_ENV_VAR, processHelper.getStartCommand(), true));
           }
           // Otherwise the call is for the shutdown helper
           //
           else {
             final String stopKey = jettyModel.getStopKey();
-            final String jettyOptsEnvVar = MessageFormat.format(JETTY_STOP_COMMAND_TEMPLATE, stopPort, stopKey);
+            final String jettyOptsEnvVar = MessageFormat.format(
+              processHelper.getStopCommandTemplate(), stopPort, stopKey);
 
-            vars.add(new EnvironmentVariable(JettyConstants.JETTY_OPTS_ENV_VAR, jettyOptsEnvVar, true));
+            vars.add(new EnvironmentVariable(JETTY_OPTS_ENV_VAR, jettyOptsEnvVar, true));
             jettyModel.setStopPort(0);
           }
         }
         catch (RuntimeConfigurationException e) {
           // Ignore
+        }
+        catch (JettyException e) {
+          // Ignore?
         }
 
         return vars;
