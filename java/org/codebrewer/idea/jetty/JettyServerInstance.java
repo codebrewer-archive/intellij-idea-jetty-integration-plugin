@@ -27,9 +27,13 @@ import com.intellij.execution.process.ProcessOutputTypes;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.javaee.serverInstances.DefaultJ2EEServerEvent;
 import com.intellij.javaee.serverInstances.DefaultServerInstance;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.text.StringUtil;
 import org.codebrewer.idea.jetty.versionsupport.JettyVersionHelper;
 import org.jetbrains.annotations.NotNull;
+
+import javax.swing.SwingUtilities;
 
 /**
  * @author Mark Scott
@@ -45,6 +49,20 @@ public class JettyServerInstance extends DefaultServerInstance
   {
     super(runConfiguration);
     this.versionHelper = versionHelper;
+  }
+
+  private void reportJettyStartupDetectionFailure()
+  {
+    SwingUtilities.invokeLater(new Runnable()
+    {
+      @Override
+      public void run()
+      {
+        Messages.showErrorDialog(getCommonModel().getProject(),
+          JettyBundle.message("error.text.failed.to.detect.jetty.startup"),
+          JettyBundle.message("error.title.failed.to.detect.jetty.startup"));
+      }
+    });
   }
 
   @Override
@@ -81,25 +99,40 @@ public class JettyServerInstance extends DefaultServerInstance
         @Override
         public void onTextAvailable(final ProcessEvent event, final Key outputType)
         {
-          final String text = event.getText();
+          final String text = StringUtil.convertLineSeparators(event.getText(), "");
 
           if (stdoutLinesRead < 2 && ProcessOutputTypes.STDOUT.equals(outputType)) {
             stdoutLinesRead++;
             switch (stdoutLinesRead) {
               case 1:
-                jettyModel.setStopPort(Integer.parseInt(text.substring(0, text.indexOf(System.getProperty("line.separator")))));
+                try {
+                  jettyModel.setStopPort(Integer.parseInt(text.substring(0)));
+                }
+                catch (NumberFormatException e) {
+                  // Something's gone wrong, and we probably can't stop Jetty
+                  // now (if it's running)
+                  //
+                  processHandler.removeProcessListener(this);
+                  reportJettyStartupDetectionFailure();
+                }
                 break;
               case 2:
-                jettyModel.setStopKey(text.substring(text.indexOf('=') + 1, text.indexOf(System.getProperty("line.separator"))));
+                jettyModel.setStopKey(text.substring(text.indexOf('=') + 1));
                 break;
               default:
             }
           }
 
           if (!isStartedUp &&
+            jettyModel.getStopPort() != 0 &&
             ProcessOutputTypes.STDOUT.equals(outputType) &&
             versionHelper.getProcessHelper().isStartingMessage(text)) {
             isStartedUp = true;
+          }
+
+          if (!isStartedUp && stdoutLinesRead > 2) {
+            processHandler.removeProcessListener(this);
+            reportJettyStartupDetectionFailure();
           }
         }
       });
