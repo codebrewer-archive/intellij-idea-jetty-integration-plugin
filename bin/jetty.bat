@@ -25,25 +25,20 @@
 setlocal
 
 if exist "%JAVA_HOME%\bin\java.exe" goto JavaFound
-echo "JAVA_HOME does not point at a JDK or JRE.  Either set the JAVA_HOME environment variable or specify a JDK for your IDEA project."
+echo JAVA_HOME does not point at a JDK or JRE.  Either set the JAVA_HOME environment variable or specify a JDK for your IDEA project.
 exit 1
 
 :JavaFound
 if exist "%JETTY_HOME%\start.jar" goto StartJarFound
-echo "JETTY_HOME\start.jar was not found.  Check your Jetty installation."
+echo JETTY_HOME\start.jar was not found.  Check your Jetty installation.
 exit 1
 
 :StartJarFound
-::
-:: The following two lines depend on command extensions being enabled, and that
-:: can't be enforced when IDEA launches Jetty (the launcher isn't under the
-:: plug-in's.control.  If command extensions are off by default then uncomment
-:: lines 43 and 44 and comment out lines 46 and 47.
-::
-::if "%JETTY_OPTS%" == "" set JETTY_OPTS=-cp start.jar org.mortbay.start.Main
-::if not "%JAVA_OPTS%" == "" set JETTY_OPTS=%JAVA_OPTS% %JETTY_OPTS%
-::
-if not defined JETTY_OPTS set JETTY_OPTS=-cp start.jar org.mortbay.start.Main
+if defined JETTY_OPTS goto JettyOptsSet
+echo JETTY_OPTS was not set before attempting to launch Jetty.
+exit 1
+
+:JettyOptsSet
 if defined JAVA_OPTS set JETTY_OPTS=%JAVA_OPTS% %JETTY_OPTS%
 
 set PWD=%CD%

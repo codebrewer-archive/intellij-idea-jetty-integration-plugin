@@ -35,7 +35,8 @@ if [ ! -f "${JETTY_HOME}/start.jar" ]; then
 fi
 
 if [ -z "${JETTY_OPTS}" ]; then
-  JETTY_OPTS="-cp start.jar org.mortbay.start.Main"
+  echo "JETTY_OPTS was not set before attempting to launch Jetty."
+  exit 1
 fi
 
 if [ ! -z "${JAVA_OPTS}" ]; then
