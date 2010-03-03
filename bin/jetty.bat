@@ -43,8 +43,8 @@ exit 1
 ::if "%JETTY_OPTS%" == "" set JETTY_OPTS=-cp start.jar org.mortbay.start.Main
 ::if not "%JAVA_OPTS%" == "" set JETTY_OPTS=%JAVA_OPTS% %JETTY_OPTS%
 ::
-if not defined %JETTY_OPTS% set JETTY_OPTS=-cp start.jar org.mortbay.start.Main
-if defined %JAVA_OPTS% set JETTY_OPTS=%JAVA_OPTS% %JETTY_OPTS%
+if not defined JETTY_OPTS set JETTY_OPTS=-cp start.jar org.mortbay.start.Main
+if defined JAVA_OPTS set JETTY_OPTS=%JAVA_OPTS% %JETTY_OPTS%
 
 set PWD=%CD%
 cd /d "%JETTY_HOME%"
