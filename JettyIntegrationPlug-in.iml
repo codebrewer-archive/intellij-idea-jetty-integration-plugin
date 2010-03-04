@@ -7,7 +7,7 @@
       <sourceFolder url="file://$MODULE_DIR$/images" isTestSource="false" packagePrefix="images" />
       <sourceFolder url="file://$MODULE_DIR$/java" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="IDEA 8.0 JDK 1.5" jdkType="IDEA JDK" />
+    <orderEntry type="jdk" jdkName="IDEA 9.0 (IU-93.94)" jdkType="IDEA JDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="copyright">
