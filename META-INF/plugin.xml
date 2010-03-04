@@ -7,7 +7,16 @@
   <depends>com.intellij.javaee</depends>
   <vendor email="mark@codebrewer.org" logo="/images/jetty16x16.png">Codebrewer</vendor>
   <change-notes>
-    <![CDATA[<b>Version 0.4.1 (Build 54)</b>
+    <![CDATA[<b>Version 0.5.0 (Build 96)</b>
+<ul>
+<li>New: Added support for Jetty 7.x.</li>
+<li>New: Extenson points provided for detecting, configuring and controlling different versions of Jetty.</li>
+<li>Removed: Support for Jetty earlier than version 6.1.0 has been dropped.</li>
+<li>Fixed: Possible NumberFormatException on launching Jetty.</li>
+<li>Fixed: Possible NullPointerException adding application server configuration file.</li>
+<li>Fixed: jetty.bat fails if JAVA_OPTS or JETTY_OPTS has a value containing a double quote character.</li>
+</ul>
+<b>Version 0.4.1 (Build 54)</b>
 <ul>
 <li>Fixed: Updated version dependency information for compatibility with IDEA 8.1.</li>
 </ul>
