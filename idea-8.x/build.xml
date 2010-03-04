@@ -1,0 +1,197 @@
+<!--
+  ~ Copyright 2007, 2008, 2010 Mark Scott, Peter Niederwieser
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!-- $Id$ -->
+
+<project name="Jetty Integration Plug-in" default="build" basedir=".">
+
+  <property file="idea.build.properties" />
+
+  <property name="project.name" value="Jetty Integration" />
+  <property name="project.name.compressed" value="JettyIntegration" />
+
+  <property name="bin" value="bin" />
+  <property name="docs" location="docs" />
+  <property name="images" location="images" />
+  <property name="lib" location="lib" />
+  <property name="meta-inf" location="META-INF" />
+  <property name="src" location="java" />
+  <property name="staging" location="${jetty.staging}" />
+  <property name="build" location="${staging}/build" />
+  <property name="classes" location="${build}/classes" />
+  <property name="dist" location="${staging}/dist" />
+  <property name="help" location="docs/javahelp" />
+
+  <path id="classpath" description="Classpath for compiling plug-in sources">
+    <fileset dir="${idea.home}/lib">
+      <include name="annotations.jar" />
+      <include name="extensions.jar" />
+      <include name="jdom.jar" />
+      <include name="openapi.jar" />
+      <include name="util.jar" />
+    </fileset>
+    <fileset dir="${idea.home}/plugins/JavaEE/lib">
+      <include name="javaee-openapi.jar" />
+    </fileset>
+    <fileset dir="${idea.home}/plugins/PersistenceSupport/lib">
+      <include name="persistence-openapi.jar" />
+    </fileset>
+    <fileset dir="${idea.home}/plugins/DatabaseSupport/lib">
+      <include name="database-openapi.jar" />
+    </fileset>
+  </path>
+
+  <target name="build"
+          depends="clean, compile, copy_licences, copy_bin_dir, increment_build_number, make_jar, make_resources_jar, make_source_zip, make_plugin_zip"
+          description="Compiles all source code, creates plug-in jar file and zip archive with required libs">
+  </target>
+
+  <target name="clean">
+    <delete includeemptydirs="true" failonerror="false">
+      <fileset dir="${staging}">
+        <include name="**/*" />
+      </fileset>
+    </delete>
+  </target>
+
+  <target name="compile">
+    <mkdir dir="${build}/classes" />
+    <javac debug="true" destdir="${build}/classes" source="1.5">
+      <src path="${src}" />
+      <classpath refid="classpath" />
+    </javac>
+  </target>
+
+  <target name="copy_licences">
+    <mkdir dir="${dist}" />
+    <copy todir="${dist}">
+      <fileset dir="." includes="LICENSE, NOTICE" />
+    </copy>
+  </target>
+
+  <target name="copy_bin_dir">
+    <mkdir dir="${dist}/bin" />
+    <copy todir="${dist}/bin">
+      <fileset dir="${bin}" includes="*" />
+    </copy>
+  </target>
+
+  <target name="increment_build_number">
+    <propertyfile file="${src}/org/codebrewer/idea/jetty/build/build.properties">
+      <entry key="build.number" type="int" default="1" operation="+" />
+      <entry key="build.date" type="date" value="now" pattern="MMMM d, yyyy" />
+    </propertyfile>
+  </target>
+
+  <target name="prepare_plugin_descriptor">
+    <property file="${src}/org/codebrewer/idea/jetty/build/build.properties" />
+    <copy file="${meta-inf}/plugin.xml" todir="${build}" />
+    <replaceregexp file="${build}/plugin.xml"
+                   match="##IDEA_VERSION_MIN##"
+                   replace="${idea.version.min}" />
+    <replaceregexp file="${build}/plugin.xml"
+                   match="##IDEA_VERSION_MAX##"
+                   replace="${idea.version.max}" />
+    <replaceregexp file="${build}/plugin.xml"
+                   match="##PLUGIN_VERSION##"
+                   replace="${build.version.major}.${build.version.minor}.${build.version.revision}.${build.number}" />
+  </target>
+
+  <target name="make_jar" depends="increment_build_number, prepare_plugin_descriptor">
+    <mkdir dir="${dist}/lib" />
+    <property file="${src}/org/codebrewer/idea/jetty/build/build.properties" />
+    <jar jarfile="${dist}/lib/${project.name.compressed}.jar" compress="yes">
+      <manifest>
+        <section name="IDEA Plug-in">
+          <attribute name="Build-date" value="${build.date}" />
+          <attribute name="Built-for-IDEA" value="${idea.version.min}" />
+          <attribute name="Description" value="${project.name}" />
+          <attribute name="Version"
+                     value="${build.version.major}.${build.version.minor}.${build.version.revision}.${build.number}" />
+        </section>
+      </manifest>
+      <metainf dir="${build}" includes="plugin.xml" />
+      <fileset dir="${classes}" includes="**" />
+      <fileset dir="${basedir}" includes="images/*png" />
+      <fileset dir="${src}" includes="**/build.properties" />
+    </jar>
+  </target>
+
+  <target name="make_resources_jar" depends="make_jar">
+    <property file="${src}/org/codebrewer/idea/jetty/build/build.properties" />
+    <jar jarfile="${dist}/lib/resources_en.jar" compress="yes">
+      <manifest>
+        <section name="IDEA Plug-in">
+          <attribute name="Build-date" value="${build.date}" />
+          <attribute name="Built-for-IDEA" value="${idea.version.min}" />
+          <attribute name="Description" value="${project.name}" />
+          <attribute name="Version"
+                     value="${build.version.major}.${build.version.minor}.${build.version.revision}.${build.number}" />
+        </section>
+      </manifest>
+      <fileset dir="${src}" includes="fileTemplates/**" />
+      <fileset dir="${src}" includes="**/JettyBundle.properties" />
+    </jar>
+  </target>
+
+  <target name="make_source_zip">
+    <mkdir dir="${build}/src" />
+    <mkdir dir="${dist}/src" />
+    <property file="${src}/org/codebrewer/idea/jetty/build/build.properties" />
+    <echo file="${build}/src/README">README for ${project} plug-in sources
+
+      Version ${build.version.major}.${build.version.minor}.${build.version.revision}.${build.number}
+      ${build.date}
+
+      To compile using Ant, first edit idea.build.properties as appropriate.
+
+      The 'build' target will create a zip archive suitable for extracting into
+      IDEA's plug-ins directory. The 'deploy' target will unzip the archive into an
+      IDEA plug-in development sandbox (useful if you want to hack on the plug-in).
+    </echo>
+    <zip
+        destfile="${dist}/src/${project.name.compressed}-${build.version.major}.${build.version.minor}.${build.version.revision}.${build.number}-src.zip"
+        encoding="UTF8">
+      <zipfileset dir="${bin}" prefix="bin" />
+      <zipfileset dir="${images}" prefix="images" includes="*png, *xcf" />
+      <zipfileset dir="${meta-inf}" prefix="META-INF" />
+      <zipfileset dir="${src}" prefix="java" />
+      <zipfileset file="**.xml" />
+      <zipfileset file="LICENSE" />
+      <zipfileset file="NOTICE" />
+      <zipfileset file="idea.build.properties" />
+      <zipfileset file="*.iml" />
+      <zipfileset file="*.ipr" />
+      <zipfileset file="${build}/src/README" />
+    </zip>
+  </target>
+
+  <target name="make_plugin_zip">
+    <zip destfile="${staging}/${project.name.compressed}.zip" encoding="UTF8">
+      <zipfileset dir="${dist}" prefix="${project.name.compressed}" />
+    </zip>
+  </target>
+
+  <target name="deploy" description="[Optional] - deploys the plug-in build to an IDEA plug-in development sandbox">
+    <delete includeemptydirs="true" failonerror="false">
+      <fileset dir="${idea.plugins.sandbox.home}/plugins/${project.name.compressed}">
+        <include name="**/*" />
+      </fileset>
+    </delete>
+    <unzip src="${staging}/${project.name.compressed}.zip" dest="${idea.plugins.sandbox.home}/plugins" />
+  </target>
+
+</project>
