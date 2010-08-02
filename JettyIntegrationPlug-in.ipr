@@ -7,20 +7,9 @@
       <antReference projectDefault="true" />
       <customJdkName value="" />
       <maximumHeapSize value="128" />
-      <maximumStackSize value="32" />
+      <maximumStackSize value="2" />
       <properties />
     </buildFile>
-  </component>
-  <component name="BuildJarProjectSettings">
-    <option name="BUILD_JARS_ON_MAKE" value="false" />
-  </component>
-  <component name="CodeStyleProjectProfileManger">
-    <option name="PROJECT_PROFILE" />
-    <option name="USE_PROJECT_LEVEL_SETTINGS" value="false" />
-  </component>
-  <component name="CommitLogProjectComponent">
-    <option name="textualCommitCommentTemplate" value="$COMMIT_MESSAGE$&#10;[ROOTS_SECTION]&#10;[ROOT_ENTRY]Module \[$ROOT_NAME$\]:&#10;&#10;[ALL_FILES][FILE_ENTRY]  $CHANGE_SYMBOL$ $FILE_NAME$&#10;[/FILE_ENTRY]&#10;[/ALL_FILES][/ROOT_ENTRY][/ROOTS_SECTION]&#10;" />
-    <option name="textualCommitLogTemplate" value="$COMMIT_MESSAGE$&#10;&#10;File summary : $FILE_COUNT$ files affected in $ROOT_COUNT$ modules.&#10;[ROOTS_SECTION]Modules affected : $ROOT_LIST$&#10;&#10;[ROOT_ENTRY]Module \[$ROOT_NAME$\]:&#10;&#10;[DELETED_FILES]$FILE_COUNT$ Deleted files:&#10;[FILE_ENTRY]  $PATH_FROM_ROOT$/$FILE_NAME$ $OLD_REVISION_NUMBER$ deleted&#10;[/FILE_ENTRY]&#10;[/DELETED_FILES][MODIFIED_FILES]$FILE_COUNT$ Modified files:&#10;[FILE_ENTRY]  $PATH_FROM_ROOT$/$FILE_NAME$ $OLD_REVISION_NUMBER$ -&gt; $NEW_REVISION_NUMBER$&#10;[/FILE_ENTRY]&#10;[/MODIFIED_FILES][ADDED_FILES]$FILE_COUNT$ Added files:&#10;[FILE_ENTRY]  $PATH_FROM_ROOT$/$FILE_NAME$ $NEW_REVISION_NUMBER$&#10;[/FILE_ENTRY]&#10;[/ADDED_FILES][/ROOT_ENTRY][/ROOTS_SECTION]Committed at $DATE_TIME$&#10;" />
   </component>
   <component name="CompilerConfiguration">
     <option name="DEFAULT_COMPILER" value="Javac" />
@@ -38,39 +27,18 @@
       <entry name="?*.html" />
       <entry name="?*.dtd" />
       <entry name="?*.tld" />
+      <entry name="?*.ftl" />
     </wildcardResourcePatterns>
     <annotationProcessing enabled="false" useClasspath="true" />
   </component>
   <component name="CopyrightManager" default="">
     <module2copyright />
   </component>
-  <component name="DependenciesAnalyzeManager">
-    <option name="myForwardDirection" value="false" />
-  </component>
   <component name="DependencyValidationManager">
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
-  <component name="EclipseCompilerSettings">
-    <option name="GENERATE_NO_WARNINGS" value="true" />
-    <option name="DEPRECATION" value="false" />
-  </component>
-  <component name="EclipseEmbeddedCompilerSettings">
-    <option name="DEBUGGING_INFO" value="true" />
-    <option name="GENERATE_NO_WARNINGS" value="true" />
-    <option name="DEPRECATION" value="false" />
-    <option name="ADDITIONAL_OPTIONS_STRING" value="" />
-    <option name="MAXIMUM_HEAP_SIZE" value="128" />
-  </component>
   <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false" />
-  <component name="EntryPointsManager">
-    <entry_points />
-  </component>
-  <component name="ExportToHTMLSettings">
-    <option name="PRINT_LINE_NUMBERS" value="false" />
-    <option name="OPEN_IN_BROWSER" value="false" />
-    <option name="OUTPUT_DIRECTORY" />
-  </component>
-  <component name="IdProvider" IDEtalkID="823271DF76B5F9106836627F7CF2F823" />
+  <component name="IdProvider" IDEtalkID="9EA227C765A0844BD8C0D9E3F1419E31" />
   <component name="InspectionProjectProfileManager">
     <profiles>
       <profile version="1.0" is_locked="false">
@@ -85,27 +53,16 @@
     <option name="PROJECT_PROFILE" value="Project Default" />
     <option name="USE_PROJECT_PROFILE" value="true" />
     <version value="1.0" />
-    <info color="ffff">
-      <option name="FOREGROUND" />
-      <option name="BACKGROUND" />
-      <option name="FONT_TYPE" value="0" />
-      <option name="EFFECT_COLOR" />
-      <option name="EFFECT_TYPE" value="0" />
-      <option name="ERROR_STRIPE_COLOR" />
-      <option name="myName" value="STYLE" />
-      <option name="myVal" value="100" />
-      <option name="myExternalName" value="STYLE" />
-      <option name="myDefaultAttributes">
-        <value>
-          <option name="FOREGROUND" />
-          <option name="BACKGROUND" value="ffff00" />
-          <option name="FONT_TYPE" value="0" />
-          <option name="EFFECT_COLOR" />
-          <option name="EFFECT_TYPE" value="0" />
-          <option name="ERROR_STRIPE_COLOR" value="ffff00" />
-        </value>
-      </option>
-    </info>
+  </component>
+  <component name="IssueNavigationConfiguration">
+    <option name="links">
+      <list>
+        <IssueNavigationLink>
+          <option name="issueRegexp" value="[A-Z]+\-\d+" />
+          <option name="linkRegexp" value="http://hq.codebrewer.com/jira/browse/$0" />
+        </IssueNavigationLink>
+      </list>
+    </option>
   </component>
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" />
@@ -123,12 +80,6 @@
     <option name="HEAP_SIZE" />
     <option name="LOCALE" />
     <option name="OPEN_IN_BROWSER" value="true" />
-  </component>
-  <component name="LogConsolePreferences">
-    <option name="FILTER_ERRORS" value="false" />
-    <option name="FILTER_WARNINGS" value="false" />
-    <option name="FILTER_INFO" value="true" />
-    <option name="CUSTOM_FILTER" />
   </component>
   <component name="Palette2">
     <group name="Swing">
@@ -251,33 +202,27 @@
       </item>
     </group>
   </component>
-  <component name="ProjectDetails">
-    <option name="projectName" value="JettyIntegrationPlug-in" />
-  </component>
-  <component name="ProjectKey">
-    <option name="state" value="svn+ssh://svn.hq.codebrewer.com/idea_plugins/jetty_plugin/trunk/JettyIntegrationPlug-in.ipr" />
-  </component>
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/JettyIntegrationPlug-in.iml" filepath="$PROJECT_DIR$/JettyIntegrationPlug-in.iml" />
+      <module fileurl="file://$PROJECT_DIR$//JettyIntegrationPlug-in.iml" filepath="$PROJECT_DIR$//JettyIntegrationPlug-in.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6.0 Update 18" project-jdk-type="JavaSDK">
-    <output url="file://$PROJECT_DIR$/../../../classbox/IDEA/idea_plugins/jetty_plugin" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="IDEA JDK (1.6.0_20 with tools.jar)" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="ProjectRunConfigurationManager">
     <configuration default="false" name="Jetty Integration" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
       <module name="JettyIntegrationPlug-in" />
-      <option name="VM_PARAMETERS" value="-ea -XX:MaxPermSize=250m -XX:-ReduceInitialCardMarks" />
+      <option name="VM_PARAMETERS" value="-ea -XX:MaxPermSize=250m" />
       <option name="PROGRAM_PARAMETERS" value="nosplash" />
-      <log_file path="$PROJECT_DIR$/../../../../.idea/sandboxes/idea-9.0/system/log/idea.log" checked="false" skipped="true" show_all="false" alias="IDEA LOG" />
+      <log_file path="$PROJECT_DIR$/../../.idea/sandboxes/idea-9.0.3/system/log/idea.log" checked="false" skipped="true" show_all="false" alias="IDEA LOG" />
       <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="60749" />
+        <option name="DEBUG_PORT" value="36782" />
         <option name="TRANSPORT" value="0" />
         <option name="LOCAL" value="true" />
       </RunnerSettings>
       <RunnerSettings RunnerId="Profile ">
-        <option name="myExternalizedOptions" value="&#10;additional-options=&#10;snapshots-dir=&#10;" />
+        <option name="myExternalizedOptions" value="&#10;snapshots-dir=&#10;additional-options2=onexit\=snapshot&#10;" />
       </RunnerSettings>
       <ConfigurationWrapper RunnerId="Debug" />
       <method>
@@ -286,225 +231,10 @@
     </configuration>
   </component>
   <component name="SvnBranchConfigurationManager">
-    <option name="myConfigurationMap">
-      <map>
-        <entry key="$PROJECT_DIR$">
-          <value>
-            <SvnBranchConfiguration>
-              <option name="branchMap">
-                <map>
-                  <entry key="svn+ssh://svn.hq.codebrewer.com/idea_plugins/jetty_plugin/branches">
-                    <value>
-                      <list />
-                    </value>
-                  </entry>
-                  <entry key="svn+ssh://svn.hq.codebrewer.com/idea_plugins/jetty_plugin/tags">
-                    <value>
-                      <list />
-                    </value>
-                  </entry>
-                </map>
-              </option>
-              <option name="branchUrls">
-                <list>
-                  <option value="svn+ssh://svn.hq.codebrewer.com/idea_plugins/jetty_plugin/branches" />
-                  <option value="svn+ssh://svn.hq.codebrewer.com/idea_plugins/jetty_plugin/tags" />
-                </list>
-              </option>
-              <option name="trunkUrl" value="svn+ssh://svn.hq.codebrewer.com/idea_plugins/jetty_plugin/trunk" />
-            </SvnBranchConfiguration>
-          </value>
-        </entry>
-      </map>
-    </option>
-    <option name="myVersion" value="124" />
     <option name="mySupportsUserInfoFilter" value="true" />
   </component>
   <component name="VcsDirectoryMappings">
-    <mapping directory="" vcs="svn" />
-  </component>
-  <component name="ZipChangesCommitExecutor">
-    <option name="PATCH_PATH" value="" />
-  </component>
-  <component name="com.intellij.jsf.UserDefinedFacesConfigs">
-    <option name="USER_DEFINED_CONFIGS">
-      <value>
-        <list size="0" />
-      </value>
-    </option>
-  </component>
-  <component name="copyright">
-    <Base>
-      <setting name="state" value="1" />
-    </Base>
-    <LanguageOptions name="$TEMPLATE$">
-      <option name="templateOptions">
-        <value>
-          <option name="block" value="true" />
-          <option name="separateBefore" value="false" />
-          <option name="separateAfter" value="false" />
-          <option name="prefixLines" value="true" />
-          <option name="lenBefore" value="80" />
-          <option name="lenAfter" value="80" />
-          <option name="box" value="false" />
-          <option name="filler" value=" " />
-        </value>
-      </option>
-      <option name="notice" value="Copyright &amp;#36;today.year Mark Scott&#10;&#10;Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);&#10;you may not use this file except in compliance with the License.&#10;You may obtain a copy of the License at&#10;&#10;    http://www.apache.org/licenses/LICENSE-2.0&#10;&#10;Unless required by applicable law or agreed to in writing, software&#10;distributed under the License is distributed on an &quot;AS IS&quot; BASIS,&#10;WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.&#10;See the License for the specific language governing permissions and&#10;limitations under the License." />
-      <option name="keyword" value="Copyright" />
-      <option name="fileTypeOverride" value="4" />
-      <option name="relativeBefore" value="true" />
-      <option name="addBlankAfter" value="false" />
-      <option name="fileLocation" value="1" />
-      <option name="useAlternate" value="false" />
-    </LanguageOptions>
-    <LanguageOptions name="CSS">
-      <option name="templateOptions">
-        <value>
-          <option name="block" value="true" />
-          <option name="separateBefore" value="false" />
-          <option name="separateAfter" value="false" />
-          <option name="prefixLines" value="true" />
-          <option name="lenBefore" value="80" />
-          <option name="lenAfter" value="80" />
-          <option name="box" value="false" />
-          <option name="filler" value=" " />
-        </value>
-      </option>
-      <option name="notice" value="Copyright (c) &amp;#36;today.year, Your Corporation. All Rights Reserved." />
-      <option name="keyword" value="Copyright" />
-      <option name="fileTypeOverride" value="2" />
-      <option name="relativeBefore" value="true" />
-      <option name="addBlankAfter" value="true" />
-      <option name="fileLocation" value="1" />
-      <option name="useAlternate" value="false" />
-    </LanguageOptions>
-    <LanguageOptions name="HTML">
-      <option name="templateOptions">
-        <value>
-          <option name="block" value="true" />
-          <option name="separateBefore" value="false" />
-          <option name="separateAfter" value="false" />
-          <option name="prefixLines" value="true" />
-          <option name="lenBefore" value="80" />
-          <option name="lenAfter" value="80" />
-          <option name="box" value="false" />
-          <option name="filler" value=" " />
-        </value>
-      </option>
-      <option name="notice" value="Copyright (c) &amp;#36;today.year, Your Corporation. All Rights Reserved." />
-      <option name="keyword" value="Copyright" />
-      <option name="fileTypeOverride" value="2" />
-      <option name="relativeBefore" value="true" />
-      <option name="addBlankAfter" value="true" />
-      <option name="fileLocation" value="1" />
-      <option name="useAlternate" value="false" />
-    </LanguageOptions>
-    <LanguageOptions name="JAVA">
-      <option name="templateOptions">
-        <value>
-          <option name="block" value="true" />
-          <option name="separateBefore" value="false" />
-          <option name="separateAfter" value="false" />
-          <option name="prefixLines" value="true" />
-          <option name="lenBefore" value="80" />
-          <option name="lenAfter" value="80" />
-          <option name="box" value="false" />
-          <option name="filler" value=" " />
-        </value>
-      </option>
-      <option name="notice" value="Copyright (c) &amp;#36;today.year, Your Corporation. All Rights Reserved." />
-      <option name="keyword" value="Copyright" />
-      <option name="fileTypeOverride" value="2" />
-      <option name="relativeBefore" value="true" />
-      <option name="addBlankAfter" value="true" />
-      <option name="fileLocation" value="1" />
-      <option name="useAlternate" value="false" />
-    </LanguageOptions>
-    <LanguageOptions name="JSP">
-      <option name="templateOptions">
-        <value>
-          <option name="block" value="true" />
-          <option name="separateBefore" value="false" />
-          <option name="separateAfter" value="false" />
-          <option name="prefixLines" value="true" />
-          <option name="lenBefore" value="80" />
-          <option name="lenAfter" value="80" />
-          <option name="box" value="false" />
-          <option name="filler" value=" " />
-        </value>
-      </option>
-      <option name="notice" value="Copyright (c) &amp;#36;today.year, Your Corporation. All Rights Reserved." />
-      <option name="keyword" value="Copyright" />
-      <option name="fileTypeOverride" value="2" />
-      <option name="relativeBefore" value="true" />
-      <option name="addBlankAfter" value="true" />
-      <option name="fileLocation" value="1" />
-      <option name="useAlternate" value="false" />
-    </LanguageOptions>
-    <LanguageOptions name="JavaScript">
-      <option name="templateOptions">
-        <value>
-          <option name="block" value="true" />
-          <option name="separateBefore" value="false" />
-          <option name="separateAfter" value="false" />
-          <option name="prefixLines" value="true" />
-          <option name="lenBefore" value="80" />
-          <option name="lenAfter" value="80" />
-          <option name="box" value="false" />
-          <option name="filler" value=" " />
-        </value>
-      </option>
-      <option name="notice" value="Copyright (c) &amp;#36;today.year, Your Corporation. All Rights Reserved." />
-      <option name="keyword" value="Copyright" />
-      <option name="fileTypeOverride" value="2" />
-      <option name="relativeBefore" value="true" />
-      <option name="addBlankAfter" value="true" />
-      <option name="fileLocation" value="1" />
-      <option name="useAlternate" value="false" />
-    </LanguageOptions>
-    <LanguageOptions name="Properties">
-      <option name="templateOptions">
-        <value>
-          <option name="block" value="true" />
-          <option name="separateBefore" value="false" />
-          <option name="separateAfter" value="false" />
-          <option name="prefixLines" value="true" />
-          <option name="lenBefore" value="80" />
-          <option name="lenAfter" value="80" />
-          <option name="box" value="false" />
-          <option name="filler" value=" " />
-        </value>
-      </option>
-      <option name="notice" value="Copyright (c) &amp;#36;today.year, Your Corporation. All Rights Reserved." />
-      <option name="keyword" value="Copyright" />
-      <option name="fileTypeOverride" value="2" />
-      <option name="relativeBefore" value="true" />
-      <option name="addBlankAfter" value="true" />
-      <option name="fileLocation" value="1" />
-      <option name="useAlternate" value="false" />
-    </LanguageOptions>
-    <LanguageOptions name="XML">
-      <option name="templateOptions">
-        <value>
-          <option name="block" value="true" />
-          <option name="separateBefore" value="false" />
-          <option name="separateAfter" value="false" />
-          <option name="prefixLines" value="true" />
-          <option name="lenBefore" value="80" />
-          <option name="lenAfter" value="80" />
-          <option name="box" value="false" />
-          <option name="filler" value=" " />
-        </value>
-      </option>
-      <option name="notice" value="Copyright (c) &amp;#36;today.year, Your Corporation. All Rights Reserved." />
-      <option name="keyword" value="Copyright" />
-      <option name="fileTypeOverride" value="2" />
-      <option name="relativeBefore" value="true" />
-      <option name="addBlankAfter" value="true" />
-      <option name="fileLocation" value="1" />
-      <option name="useAlternate" value="false" />
-    </LanguageOptions>
+    <mapping directory="" vcs="Git" />
   </component>
 </project>
 
