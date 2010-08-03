@@ -14,8 +14,6 @@
   ~ limitations under the License.
   -->
 
-<!-- $Id$ -->
-
 <project name="Jetty Integration Plug-in" default="build" basedir=".">
 
   <property file="idea.build.properties" />
@@ -29,7 +27,7 @@
   <property name="lib" location="lib" />
   <property name="meta-inf" location="META-INF" />
   <property name="src" location="java" />
-  <property name="staging" location="${jetty.staging}" />
+  <property name="staging" location="staging" />
   <property name="build" location="${staging}/build" />
   <property name="classes" location="${build}/classes" />
   <property name="dist" location="${staging}/dist" />
@@ -68,8 +66,8 @@
   </target>
 
   <target name="compile">
-    <mkdir dir="${build}/classes" />
-    <javac debug="true" destdir="${build}/classes" source="1.6">
+    <mkdir dir="${classes}" />
+    <javac debug="true" destdir="${classes}" source="1.6">
       <src path="${src}" />
       <classpath refid="classpath" />
     </javac>
@@ -185,13 +183,28 @@
     </zip>
   </target>
 
-  <target name="deploy" description="[Optional] - deploys the plug-in build to an IDEA plug-in development sandbox">
-    <delete includeemptydirs="true" failonerror="false">
-      <fileset dir="${idea.plugins.sandbox.home}/plugins/${project.name.compressed}">
-        <include name="**/*" />
-      </fileset>
-    </delete>
-    <unzip src="${staging}/${project.name.compressed}.zip" dest="${idea.plugins.sandbox.home}/plugins" />
+  <target  name="update_sandbox"
+           description="Run this target after 'making' the project to ensure that the plugin.xml can be parsed by the IDEA instance being debugged and that Jetty can be launched"
+           depends="copy_bin_dir_to_sandbox, update_sandbox_plugin_descriptor" />
+
+  <target name="copy_bin_dir_to_sandbox">
+    <mkdir dir="sandbox/plugins/${project.name.compressed}/bin" />
+    <copy todir="sandbox/plugins/${project.name.compressed}/bin">
+      <fileset dir="${bin}" includes="*" />
+    </copy>
+  </target>
+
+  <target name="update_sandbox_plugin_descriptor">
+    <property file="${src}/org/codebrewer/idea/jetty/build/build.properties" />
+    <replaceregexp file="sandbox/plugins/${project.name.compressed}/META-INF/plugin.xml"
+                   match="##IDEA_VERSION_MIN##"
+                   replace="${idea.version.min}" />
+    <replaceregexp file="sandbox/plugins/${project.name.compressed}/META-INF/plugin.xml"
+                   match="##IDEA_VERSION_MAX##"
+                   replace="${idea.version.max}" />
+    <replaceregexp file="sandbox/plugins/${project.name.compressed}/META-INF/plugin.xml"
+                   match="##PLUGIN_VERSION##"
+                   replace="${build.version.major}.${build.version.minor}.${build.version.revision}.${build.number}" />
   </target>
 
 </project>

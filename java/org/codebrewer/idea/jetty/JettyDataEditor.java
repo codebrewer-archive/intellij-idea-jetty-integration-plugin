@@ -55,7 +55,6 @@ import java.util.List;
 /**
  * @author Mark Scott
  * @author Chris Miller
- * @version $Id$
  */
 public class JettyDataEditor extends ApplicationServerPersistentDataEditor<JettyPersistentData>
 {
@@ -78,13 +77,6 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
       }
 
       return result;
-    }
-  }
-
-  private static void checkIsDirectory(final File file) throws ConfigurationException
-  {
-    if (!file.isDirectory()) {
-      throw new ConfigurationException(JettyBundle.message("message.text.cant.find.directory", file.getAbsolutePath()));
     }
   }
 
@@ -259,12 +251,11 @@ public class JettyDataEditor extends ApplicationServerPersistentDataEditor<Jetty
     }
   }
 
-  protected void applyEditorTo(final JettyPersistentData s) throws ConfigurationException
+  protected void applyEditorTo(final JettyPersistentData s)
   {
     final File home = new File(jettyHomeField.getText()).getAbsoluteFile();
-    checkIsDirectory(home);
-    checkIsDirectory(new File(home, JettyConstants.JETTY_CONFIG_DIRECTORY_NAME));
-    checkIsDirectory(new File(home, JettyConstants.JETTY_LIB_DIRECTORY_NAME));
+
+    // Todo : find a way to report errors like a modified Jetty installation...
 
     s.setJettyHome(home.getAbsolutePath().replace(File.separatorChar, '/'));
     s.setJettyVersionHelper(versionHelper);

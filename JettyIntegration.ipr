@@ -252,76 +252,41 @@
     </group>
   </component>
   <component name="ProjectDetails">
-    <option name="projectName" value="JettyIntegrationPlug-in" />
-  </component>
-  <component name="ProjectKey">
-    <option name="state" value="svn+ssh://svn.hq.codebrewer.com/idea_plugins/jetty_plugin/trunk/JettyIntegrationPlug-in.ipr" />
+    <option name="projectName" value="JettyIntegration" />
   </component>
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/JettyIntegrationPlug-in.iml" filepath="$PROJECT_DIR$/JettyIntegrationPlug-in.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JettyIntegration.iml" filepath="$PROJECT_DIR$/JettyIntegration.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6.0 Update 18" project-jdk-type="JavaSDK">
-    <output url="file://$PROJECT_DIR$/../../../classbox/IDEA/idea_plugins/jetty_plugin" />
+    <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="ProjectRunConfigurationManager">
     <configuration default="false" name="Jetty Integration" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
-      <module name="JettyIntegrationPlug-in" />
+      <module name="JettyIntegration" />
       <option name="VM_PARAMETERS" value="-ea -XX:MaxPermSize=250m -XX:-ReduceInitialCardMarks" />
       <option name="PROGRAM_PARAMETERS" value="nosplash" />
-      <log_file path="$PROJECT_DIR$/../../../../.idea/sandboxes/idea-9.0/system/log/idea.log" checked="false" skipped="true" show_all="false" alias="IDEA LOG" />
+      <log_file path="$PROJECT_DIR$/sandbox/system/log/idea.log" checked="false" skipped="true" show_all="false" alias="IDEA LOG" />
       <RunnerSettings RunnerId="Debug">
         <option name="DEBUG_PORT" value="60749" />
         <option name="TRANSPORT" value="0" />
         <option name="LOCAL" value="true" />
       </RunnerSettings>
       <RunnerSettings RunnerId="Profile ">
-        <option name="myExternalizedOptions" value="&#10;additional-options=&#10;snapshots-dir=&#10;" />
+        <option name="myExternalizedOptions" value="&#10;snapshots-dir=&#10;additional-options2=onexit\=snapshot&#10;" />
       </RunnerSettings>
       <ConfigurationWrapper RunnerId="Debug" />
       <method>
-        <option name="Make" enabled="false" />
+        <option name="AntTarget" enabled="true" antfile="file://$PROJECT_DIR$/build.xml" target="update_sandbox" />
       </method>
     </configuration>
   </component>
   <component name="SvnBranchConfigurationManager">
-    <option name="myConfigurationMap">
-      <map>
-        <entry key="$PROJECT_DIR$">
-          <value>
-            <SvnBranchConfiguration>
-              <option name="branchMap">
-                <map>
-                  <entry key="svn+ssh://svn.hq.codebrewer.com/idea_plugins/jetty_plugin/branches">
-                    <value>
-                      <list />
-                    </value>
-                  </entry>
-                  <entry key="svn+ssh://svn.hq.codebrewer.com/idea_plugins/jetty_plugin/tags">
-                    <value>
-                      <list />
-                    </value>
-                  </entry>
-                </map>
-              </option>
-              <option name="branchUrls">
-                <list>
-                  <option value="svn+ssh://svn.hq.codebrewer.com/idea_plugins/jetty_plugin/branches" />
-                  <option value="svn+ssh://svn.hq.codebrewer.com/idea_plugins/jetty_plugin/tags" />
-                </list>
-              </option>
-              <option name="trunkUrl" value="svn+ssh://svn.hq.codebrewer.com/idea_plugins/jetty_plugin/trunk" />
-            </SvnBranchConfiguration>
-          </value>
-        </entry>
-      </map>
-    </option>
-    <option name="myVersion" value="124" />
     <option name="mySupportsUserInfoFilter" value="true" />
   </component>
   <component name="VcsDirectoryMappings">
-    <mapping directory="" vcs="svn" />
+    <mapping directory="" vcs="Git" />
   </component>
   <component name="ZipChangesCommitExecutor">
     <option name="PATCH_PATH" value="" />
