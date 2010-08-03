@@ -1,0 +1,12 @@
+This is the Jetty Integration Plug-in for IntelliJ IDEA. It allows
+configuration and use of the Jetty webserver directly from IntelliJ IDEA,
+for running/debugging web applications.
+
+The 'master' git branch is used for development against the current IDEA
+development tree. There are other branches for IDEA versions 6, 7, 8 and
+9 (although no further development for IDEA 6, 7 or 8 is envisaged).
+
+The IDEA project files may or may not be useful to you. If you're familiar
+with IDEA plug-in development then you'll doubtless be able to figure out
+what you might need to change. The project files were created with IDEA
+9.0.3.
