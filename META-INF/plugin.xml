@@ -5,13 +5,17 @@
   <description>Allows configuration and use of the Jetty webserver directly from IntelliJ IDEA, for running/debugging web applications.</description>
   <version>##PLUGIN_VERSION##</version>
   <depends>com.intellij.javaee</depends>
-  <vendor email="mark@codebrewer.org" logo="/images/jetty16x16.png">Codebrewer</vendor>
+  <vendor email="mark@codebrewer.org" url="http://github.com/codebrewer/intellij-idea-jetty-integration-plugin" logo="/images/jetty16x16.png">Codebrewer</vendor>
   <change-notes>
-    <![CDATA[<b>Version 0.5.0 (Build 97)</b>
+    <![CDATA[<b>Version 0.5.0 (Build 98)</b>
+<ul>
+<li>New: Updated for IDEA X.</li>
+</ul>
+<b>Version 0.5.0 (Build 97)</b>
 <ul>
 <li>New: Updated for IDEA 9.x.</li>
 <li>New: Added support for Jetty 7.x.</li>
-<li>New: Extenson points provided for detecting, configuring and controlling different versions of Jetty.</li>
+<li>New: Extension points provided for detecting, configuring and controlling different versions of Jetty.</li>
 <li>Removed: Support for Jetty earlier than version 6.1.0 has been dropped.</li>
 <li>Removed: Support for IntelliJ IDEA running on JDK 1.5 has been dropped.</li>
 <li>Fixed: Possible NumberFormatException on launching Jetty.</li>

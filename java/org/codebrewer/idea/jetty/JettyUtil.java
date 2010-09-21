@@ -117,7 +117,6 @@ public class JettyUtil
       throw new JettyException(JettyBundle.message("exception.text.null.deployment.source"));
     }
 
-    final DeploymentSource deploymentMethod = model.getDeploymentSource(); // DeploymentSource.FROM_JAR or DeploymentSource.FROM_EXPLODED
     final String contextPath = model.getContextPath();
     final ConfigurationFileHelper configurationFileHelper = versionHelper.getConfigurationFileHelper();
     final DocType docType = new DocType(JETTY_DOCTYPE_ELEMENT_NAME, configurationFileHelper.getDoctypePublicId(), configurationFileHelper.getDoctypeSystemId());
@@ -129,12 +128,12 @@ public class JettyUtil
     setContextPathElement.setAttribute("name", "contextPath");
     setContextPathElement.setText(contextPath);
 
-    if (deploymentMethod == DeploymentSource.FROM_EXPLODED) {
-      setDeploymentSourceElement.setAttribute("name", "resourceBase");
+    if (model.getDeploymentSource().isArchive()) {
+      setDeploymentSourceElement.setAttribute("name", "war");
       setDeploymentSourceElement.setText(deploymentSource.getAbsolutePath());
     }
     else {
-      setDeploymentSourceElement.setAttribute("name", "war");
+      setDeploymentSourceElement.setAttribute("name", "resourceBase");
       setDeploymentSourceElement.setText(deploymentSource.getAbsolutePath());
     }
 
