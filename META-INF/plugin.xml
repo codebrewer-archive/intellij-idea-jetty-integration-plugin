@@ -7,7 +7,11 @@
   <depends>com.intellij.javaee</depends>
   <vendor email="mark@codebrewer.org" url="http://github.com/codebrewer/intellij-idea-jetty-integration-plugin" logo="/images/jetty16x16.png">Codebrewer</vendor>
   <change-notes>
-    <![CDATA[<b>Version 0.5.0 (Build 98)</b>
+    <![CDATA[<b>Version 0.5.1 (Build 99)</b>
+<ul>
+<li>Fixed: NoSuchMethodError using plug-in with EAP build 98.231.</li>
+</ul>
+<b>Version 0.5.0 (Build 98)</b>
 <ul>
 <li>New: Updated for IDEA X.</li>
 </ul>

@@ -5,7 +5,7 @@
     <buildFile url="file://$PROJECT_DIR$/build.xml">
       <additionalClassPath />
       <antReference projectDefault="true" />
-      <customJdkName value="1.6.0 Update 20" />
+      <customJdkName value="" />
       <maximumHeapSize value="128" />
       <maximumStackSize value="32" />
       <properties />
@@ -262,7 +262,7 @@
   <component name="ProjectResources">
     <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6.0 Update 18" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6.0 Update 22" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="ProjectRunConfigurationManager">
@@ -270,6 +270,7 @@
       <module name="JettyIntegration" />
       <option name="VM_PARAMETERS" value="-ea -XX:MaxPermSize=250m -XX:-ReduceInitialCardMarks" />
       <option name="PROGRAM_PARAMETERS" value="nosplash" />
+      <log_file path="$PROJECT_DIR$/sandbox/system/log/idea.log" checked="false" skipped="true" show_all="false" alias="IDEA LOG" />
       <RunnerSettings RunnerId="Debug">
         <option name="DEBUG_PORT" value="60749" />
         <option name="TRANSPORT" value="0" />
