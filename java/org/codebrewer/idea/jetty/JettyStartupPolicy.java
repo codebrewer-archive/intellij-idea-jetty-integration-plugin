@@ -178,11 +178,11 @@ public class JettyStartupPolicy implements ExecutableObjectStartupPolicy
         final List<EnvironmentVariable> vars = new ArrayList<EnvironmentVariable>();
 
         try {
-          final Sdk projectJdk = ProjectRootManager.getInstance(model.getProject()).getProjectJdk();
+          final Sdk projectSdk = ProjectRootManager.getInstance(model.getProject()).getProjectSdk();
 
-          if (projectJdk != null) {
+          if (projectSdk != null) {
             vars.add(new EnvironmentVariable(
-              JAVA_HOME_ENV_PROPERTY, projectJdk.getHomePath().replace('/', File.separatorChar), true));
+              JAVA_HOME_ENV_PROPERTY, projectSdk.getHomePath().replace('/', File.separatorChar), true));
           }
           else {
             final String javaHome = EnvironmentUtil.getEnviromentProperties().get(JAVA_HOME_ENV_PROPERTY);
