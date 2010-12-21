@@ -16,12 +16,11 @@
 package org.codebrewer.idea.jetty;
 
 import com.intellij.javaee.deployment.DeploymentModel;
+import com.intellij.javaee.deployment.DeploymentSource;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.util.Factory;
-import com.intellij.packaging.artifacts.Artifact;
-import com.intellij.packaging.artifacts.ArtifactPointerManager;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.BorderFactory;
@@ -35,21 +34,19 @@ import java.awt.BorderLayout;
  *
  * @author Mark Scott
  * @author Peter Niederwieser
- * @version $Id$
  */
 public class JettyDeploymentSettingsEditor extends SettingsEditor<DeploymentModel>
 {
   private JPanel panel;
   private JTextField contextPath;
 
-  public JettyDeploymentSettingsEditor(final CommonModel configuration, final Artifact artifact)
+  public JettyDeploymentSettingsEditor(final CommonModel configuration, final DeploymentSource source)
   {
     super(new Factory<DeploymentModel>()
     {
-      public JettyModuleDeploymentModel create()
+      public DeploymentModel create()
       {
-        final ArtifactPointerManager manager = ArtifactPointerManager.getInstance(configuration.getProject());
-        return new JettyModuleDeploymentModel(configuration, manager.createPointer(artifact));
+        return new JettyModuleDeploymentModel(configuration, source);
       }
     });
 

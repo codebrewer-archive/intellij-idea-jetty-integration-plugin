@@ -15,8 +15,6 @@
  */
 package org.codebrewer.idea.jetty;
 
-import com.intellij.javaee.deployment.DeploymentManager;
-import com.intellij.javaee.deployment.DeploymentSource;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -38,11 +36,11 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 
-import static org.codebrewer.idea.jetty.versionsupport.ConfigurationFileHelper.JETTY_DOCTYPE_ELEMENT_NAME;
 import static org.codebrewer.idea.jetty.JettyConstants.DEFAULT_PORT;
 import static org.codebrewer.idea.jetty.JettyConstants.JETTY_CONFIG_DIRECTORY_NAME;
 import static org.codebrewer.idea.jetty.JettyConstants.JETTY_CONTEXT_DEPLOYER_CONFIG_DIR_NAME;
 import static org.codebrewer.idea.jetty.JettyConstants.JETTY_HOME_ENV_VAR;
+import static org.codebrewer.idea.jetty.versionsupport.ConfigurationFileHelper.JETTY_DOCTYPE_ELEMENT_NAME;
 
 /**
  * @author Mark Scott
@@ -106,12 +104,10 @@ public class JettyUtil
   }
 
   @NotNull
-  public static Document getContextDeploymentDocument(@NotNull final Project project,
-                                                      @NotNull final JettyModuleDeploymentModel model,
+  public static Document getContextDeploymentDocument(@NotNull final JettyModuleDeploymentModel model,
                                                       @NotNull JettyVersionHelper versionHelper) throws JettyException
   {
-    final DeploymentManager deploymentManager = DeploymentManager.getInstance(project);
-    final File deploymentSource = deploymentManager.getDeploymentSource(model);     // full path to war file or exploded directory
+    final File deploymentSource = model.getDeploymentSource().getFile();     // full path to war file or exploded directory
 
     if (deploymentSource == null) {
       throw new JettyException(JettyBundle.message("exception.text.null.deployment.source"));

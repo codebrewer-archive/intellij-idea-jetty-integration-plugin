@@ -16,17 +16,16 @@
 package org.codebrewer.idea.jetty;
 
 import com.intellij.javaee.deployment.DeploymentModel;
+import com.intellij.javaee.deployment.DeploymentSource;
 import com.intellij.javaee.run.configuration.CommonModel;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
-import com.intellij.packaging.artifacts.ArtifactPointer;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Mark Scott
  * @author Peter Niederwieser
- * @version $Id$
  */
 public class JettyModuleDeploymentModel extends DeploymentModel
 {
@@ -35,9 +34,9 @@ public class JettyModuleDeploymentModel extends DeploymentModel
 
   private String contextPath = DEFAULT_CONTEXT_PATH;
 
-  public JettyModuleDeploymentModel(CommonModel project, ArtifactPointer artifactPointer)
+  public JettyModuleDeploymentModel(CommonModel project, DeploymentSource source)
   {
-    super(project, artifactPointer);
+    super(project, source);
   }
 
   @NotNull
